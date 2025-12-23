@@ -4,11 +4,11 @@ import time
 # Ensure you have pyautogui installed: pip install pyautogui
 
 # Give the user some time to switch to the desired window
-print("You have 1 seconds to switch to the window where you want to click...")
-time.sleep(1)
+# print("You have 1 seconds to switch to the window where you want to click...")
+# time.sleep(1)
 
 # Define the number of clicks and the interval between clicks
-num_clicks = 200
+num_clicks = 20000
 click_interval = 0.005  # seconds between clicks
 
 # Get the current mouse position

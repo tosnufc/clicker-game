@@ -1,5 +1,13 @@
 # PowerShell script to force stop clicker.py processes
 
+param([switch]$Hidden)
+
+# If not running hidden, relaunch the script hidden
+if (-not $Hidden) {
+    Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`" -Hidden" -WindowStyle Hidden
+    exit
+}
+
 Write-Host "Stopping clicker processes..." -ForegroundColor Yellow
 
 # Find and stop Python processes running clicker.py

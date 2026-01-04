@@ -1,4 +1,4 @@
-# PowerShell script to force stop clicker.py and saga.py processes
+# PowerShell script to force stop clicker.py, saga.py, and boomer.py processes
 
 param([switch]$Hidden)
 
@@ -8,11 +8,11 @@ if (-not $Hidden) {
     exit
 }
 
-Write-Host "Stopping clicker and saga processes..." -ForegroundColor Yellow
+Write-Host "Stopping clicker, saga, and boomer processes..." -ForegroundColor Yellow
 
 # Find and stop Python processes running clicker.py or saga.py
 $pythonProcesses = Get-Process python -ErrorAction SilentlyContinue | Where-Object {
-    $_.Path -and (Get-WmiObject Win32_Process -Filter "ProcessId = $($_.Id)" -ErrorAction SilentlyContinue).CommandLine -match "(clicker\.py|saga\.py)"
+    $_.Path -and (Get-WmiObject Win32_Process -Filter "ProcessId = $($_.Id)" -ErrorAction SilentlyContinue).CommandLine -match "(clicker\.py|saga\.py|boomer\.py)"
 }
 
 if ($pythonProcesses) {
@@ -22,12 +22,12 @@ if ($pythonProcesses) {
     }
     Write-Host "Python processes stopped." -ForegroundColor Green
 } else {
-    Write-Host "No Python clicker/saga processes found." -ForegroundColor Gray
+    Write-Host "No Python clicker/saga/boomer processes found." -ForegroundColor Gray
 }
 
 # Find and stop PowerShell processes running clicker.ps1 or saga.ps1
 $psProcesses = Get-WmiObject Win32_Process -Filter "Name = 'powershell.exe'" -ErrorAction SilentlyContinue | Where-Object {
-    $_.CommandLine -match "(clicker\.ps1|saga\.ps1)"
+    $_.CommandLine -match "(clicker\.ps1|saga\.ps1|boomer\.ps1)"
 }
 
 if ($psProcesses) {
@@ -37,12 +37,12 @@ if ($psProcesses) {
     }
     Write-Host "PowerShell processes stopped." -ForegroundColor Green
 } else {
-    Write-Host "No PowerShell clicker/saga processes found." -ForegroundColor Gray
+    Write-Host "No PowerShell clicker/saga/boomer processes found." -ForegroundColor Gray
 }
 
 # Find and stop CMD processes running saga.bat
 $cmdProcesses = Get-WmiObject Win32_Process -Filter "Name = 'cmd.exe'" -ErrorAction SilentlyContinue | Where-Object {
-    $_.CommandLine -match "saga\.bat"
+    $_.CommandLine -match "(saga\.bat|boomer\.bat)"
 }
 
 if ($cmdProcesses) {
@@ -52,7 +52,7 @@ if ($cmdProcesses) {
     }
     Write-Host "CMD processes stopped." -ForegroundColor Green
 } else {
-    Write-Host "No CMD saga processes found." -ForegroundColor Gray
+    Write-Host "No CMD saga/boomer processes found." -ForegroundColor Gray
 }
 
-Write-Host "`nAll clicker and saga processes have been terminated." -ForegroundColor Green
+Write-Host "`nAll clicker, saga, and boomer processes have been terminated." -ForegroundColor Green

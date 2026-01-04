@@ -43,16 +43,16 @@ def on_press(key):
 
 def save_clicks():
     output = {"clicks": clicks}
-    with open("saga.json", "w") as f:
+    with open("recording.json", "w") as f:
         json.dump(output, f, indent=2)
-    print(f"\nSaved {len(clicks)} clicks to saga.json")
+    print(f"\nSaved {len(clicks)} clicks to recording.json")
 
 # Main
 print("=" * 50)
 print("Mouse Click Recorder")
 print("=" * 50)
 print("Left-click anywhere to record positions and timing.")
-print("Press ESCAPE to stop recording and save to saga.json")
+print("Press ESCAPE to stop recording and save to recording.json")
 print("=" * 50)
 print()
 

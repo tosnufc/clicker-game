@@ -1,7 +1,7 @@
 from pynput import mouse, keyboard
+import pyautogui
 import time
 import json
-import threading
 
 # Store recorded clicks
 clicks = []
@@ -18,6 +18,9 @@ def on_click(x, y, button, pressed):
     if button == mouse.Button.left and pressed:
         current_time = time.time()
         
+        # Use pyautogui to get position (consistent with playback coordinates)
+        pos_x, pos_y = pyautogui.position()
+        
         # Calculate delay from last click
         if last_click_time is None:
             delay = 0
@@ -26,9 +29,9 @@ def on_click(x, y, button, pressed):
         
         last_click_time = current_time
         
-        click_data = {"x": x, "y": y, "delay": delay}
+        click_data = {"x": pos_x, "y": pos_y, "delay": delay}
         clicks.append(click_data)
-        print(f"Recorded click #{len(clicks)}: ({x}, {y}) - delay: {delay}s")
+        print(f"Recorded click #{len(clicks)}: ({pos_x}, {pos_y}) - delay: {delay}s")
 
 def on_press(key):
     global running
@@ -40,16 +43,16 @@ def on_press(key):
 
 def save_clicks():
     output = {"clicks": clicks}
-    with open("clicks.json", "w") as f:
+    with open("saga.json", "w") as f:
         json.dump(output, f, indent=2)
-    print(f"\nSaved {len(clicks)} clicks to clicks.json")
+    print(f"\nSaved {len(clicks)} clicks to saga.json")
 
 # Main
 print("=" * 50)
 print("Mouse Click Recorder")
 print("=" * 50)
 print("Left-click anywhere to record positions and timing.")
-print("Press ESCAPE to stop recording and save to clicks.json")
+print("Press ESCAPE to stop recording and save to saga.json")
 print("=" * 50)
 print()
 
@@ -69,4 +72,3 @@ else:
     print("No clicks recorded.")
 
 print("Recording finished!")
-

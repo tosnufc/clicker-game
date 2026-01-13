@@ -7,15 +7,15 @@ pyautogui.FAILSAFE = False
 
 # Configuration
 REPEAT_COUNT = 15
-SEQUENCE_DELAY = 90  # seconds between sequences
+SEQUENCE_DELAY = 120  # seconds between sequences
 
 # Load clicks from JSON file
-with open("saga.json", "r") as f:
+with open("saga_team.json", "r") as f:
     data = json.load(f)
 
 clicks = data["clicks"]
 
-print(f"Loaded {len(clicks)} clicks from saga.json")
+print(f"Loaded {len(clicks)} clicks from saga_team.json")
 print(f"Will repeat {REPEAT_COUNT} times with {SEQUENCE_DELAY}s delay between sequences")
 print("=" * 40)
 
@@ -46,3 +46,4 @@ for seq in range(1, REPEAT_COUNT + 1):
 
 print("\n" + "=" * 40)
 print("All sequences completed!")
+

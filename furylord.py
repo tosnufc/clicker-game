@@ -1,3 +1,8 @@
+import ctypes
+# Make Python DPI-aware to get correct screen coordinates on Windows 10/11
+# This must be called BEFORE importing pyautogui
+ctypes.windll.shcore.SetProcessDpiAwareness(2)  # PROCESS_PER_MONITOR_DPI_AWARE
+
 import pyautogui
 import time
 import json
@@ -7,7 +12,7 @@ pyautogui.FAILSAFE = False
 
 # Configuration
 REPEAT_COUNT = 4
-SEQUENCE_DELAY = 5  # seconds between sequences
+SEQUENCE_DELAY = 5 # seconds between sequences
 
 # Load clicks from JSON file
 with open("furylord.json", "r") as f:

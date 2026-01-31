@@ -1,0 +1,25 @@
+{
+  "windows": [
+    {
+      "title": "Farmer",
+      "x": 1298,
+      "y": 0,
+      "width": 1238,
+      "height": 2160
+    },
+    {
+      "title": "Main",
+      "x": 27,
+      "y": 0,
+      "width": 1238,
+      "height": 2160
+    },
+    {
+      "title": "No-buy",
+      "x": 2568,
+      "y": 0,
+      "width": 1238,
+      "height": 2160
+    }
+  ]
+}

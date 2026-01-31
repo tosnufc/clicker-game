@@ -11,7 +11,7 @@ import json
 pyautogui.FAILSAFE = False
 
 # Configuration
-REPEAT_COUNT = 15
+REPEAT_COUNT = 30
 SEQUENCE_DELAY = 90  # seconds between sequences
 
 # Load clicks from JSON file

@@ -1,0 +1,39 @@
+{
+  "windows": [
+    {
+      "title": "Main",
+      "x": 1298,
+      "y": 0,
+      "width": 1238,
+      "height": 2160
+    },
+    {
+      "title": "Farmer",
+      "x": 2568,
+      "y": 0,
+      "width": 1238,
+      "height": 2160
+    },
+    {
+      "title": "z-farm-2",
+      "x": 692,
+      "y": 3,
+      "width": 611,
+      "height": 1046
+    },
+    {
+      "title": "z-farm-3",
+      "x": 414,
+      "y": 1056,
+      "width": 642,
+      "height": 1101
+    },
+    {
+      "title": "z-farm-4",
+      "x": 18,
+      "y": -3,
+      "width": 614,
+      "height": 1052
+    }
+  ]
+}

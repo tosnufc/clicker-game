@@ -1,4 +1,4 @@
-# PowerShell script to force stop clicker.py, saga.py, boomer.py, and hero_battlefield.py processes
+# PowerShell script to force stop all Python processes started by .py files in this directory
 
 param([switch]$Hidden)
 
@@ -8,51 +8,80 @@ if (-not $Hidden) {
     exit
 }
 
-Write-Host "Stopping clicker, saga, boomer, and hero_battlefield processes..." -ForegroundColor Yellow
+# Get the directory where this script is located
+$scriptDir = Split-Path -Parent $PSCommandPath
 
-# Find and stop Python processes running clicker.py or saga.py
+# Get all .py files in the directory and build a regex pattern
+$pyFiles = Get-ChildItem -Path $scriptDir -Filter "*.py" | ForEach-Object { [regex]::Escape($_.Name) }
+$pyPattern = ($pyFiles -join "|")
+
+# Also get .bat files for CMD processes
+$batFiles = Get-ChildItem -Path $scriptDir -Filter "*.bat" | ForEach-Object { [regex]::Escape($_.Name) }
+$batPattern = ($batFiles -join "|")
+
+# Also get .ps1 files for PowerShell processes (exclude this script)
+$ps1Files = Get-ChildItem -Path $scriptDir -Filter "*.ps1" | Where-Object { $_.Name -ne "stop.ps1" } | ForEach-Object { [regex]::Escape($_.Name) }
+$ps1Pattern = ($ps1Files -join "|")
+
+Write-Host "Stopping all automation processes from $scriptDir..." -ForegroundColor Yellow
+Write-Host ""
+
+# Find and stop Python processes running any .py file from this directory
 $pythonProcesses = Get-Process python -ErrorAction SilentlyContinue | Where-Object {
-    $_.Path -and (Get-WmiObject Win32_Process -Filter "ProcessId = $($_.Id)" -ErrorAction SilentlyContinue).CommandLine -match "(clicker\.py|saga\.py|boomer\.py|hero_battlefield\.py)"
+    $_.Path -and (Get-WmiObject Win32_Process -Filter "ProcessId = $($_.Id)" -ErrorAction SilentlyContinue).CommandLine -match "($pyPattern)"
 }
 
 if ($pythonProcesses) {
     foreach ($process in $pythonProcesses) {
+        $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($process.Id)" -ErrorAction SilentlyContinue).CommandLine
         Write-Host "Stopping Python process (PID: $($process.Id))..." -ForegroundColor Cyan
+        Write-Host "  Command: $cmdLine" -ForegroundColor DarkGray
         Stop-Process -Id $process.Id -Force
     }
     Write-Host "Python processes stopped." -ForegroundColor Green
 } else {
-    Write-Host "No Python clicker/saga/boomer/hero_battlefield processes found." -ForegroundColor Gray
+    Write-Host "No Python processes found." -ForegroundColor Gray
 }
 
-# Find and stop PowerShell processes running clicker.ps1 or saga.ps1
-$psProcesses = Get-WmiObject Win32_Process -Filter "Name = 'powershell.exe'" -ErrorAction SilentlyContinue | Where-Object {
-    $_.CommandLine -match "(clicker\.ps1|saga\.ps1|boomer\.ps1)"
-}
+Write-Host ""
 
-if ($psProcesses) {
-    foreach ($process in $psProcesses) {
-        Write-Host "Stopping PowerShell process (PID: $($process.ProcessId))..." -ForegroundColor Cyan
-        Stop-Process -Id $process.ProcessId -Force
+# Find and stop PowerShell processes running any .ps1 file from this directory
+if ($ps1Pattern) {
+    $psProcesses = Get-WmiObject Win32_Process -Filter "Name = 'powershell.exe'" -ErrorAction SilentlyContinue | Where-Object {
+        $_.CommandLine -match "($ps1Pattern)"
     }
-    Write-Host "PowerShell processes stopped." -ForegroundColor Green
-} else {
-    Write-Host "No PowerShell clicker/saga/boomer processes found." -ForegroundColor Gray
-}
 
-# Find and stop CMD processes running saga.bat
-$cmdProcesses = Get-WmiObject Win32_Process -Filter "Name = 'cmd.exe'" -ErrorAction SilentlyContinue | Where-Object {
-    $_.CommandLine -match "(saga\.bat|boomer\.bat|hero_battlefield\.bat)"
-}
-
-if ($cmdProcesses) {
-    foreach ($process in $cmdProcesses) {
-        Write-Host "Stopping CMD process (PID: $($process.ProcessId))..." -ForegroundColor Cyan
-        Stop-Process -Id $process.ProcessId -Force
+    if ($psProcesses) {
+        foreach ($process in $psProcesses) {
+            Write-Host "Stopping PowerShell process (PID: $($process.ProcessId))..." -ForegroundColor Cyan
+            Write-Host "  Command: $($process.CommandLine)" -ForegroundColor DarkGray
+            Stop-Process -Id $process.ProcessId -Force
+        }
+        Write-Host "PowerShell processes stopped." -ForegroundColor Green
+    } else {
+        Write-Host "No PowerShell processes found." -ForegroundColor Gray
     }
-    Write-Host "CMD processes stopped." -ForegroundColor Green
-} else {
-    Write-Host "No CMD saga/boomer/hero_battlefield processes found." -ForegroundColor Gray
 }
 
-Write-Host "`nAll clicker, saga, boomer, and hero_battlefield processes have been terminated." -ForegroundColor Green
+Write-Host ""
+
+# Find and stop CMD processes running any .bat file from this directory
+if ($batPattern) {
+    $cmdProcesses = Get-WmiObject Win32_Process -Filter "Name = 'cmd.exe'" -ErrorAction SilentlyContinue | Where-Object {
+        $_.CommandLine -match "($batPattern)"
+    }
+
+    if ($cmdProcesses) {
+        foreach ($process in $cmdProcesses) {
+            Write-Host "Stopping CMD process (PID: $($process.ProcessId))..." -ForegroundColor Cyan
+            Write-Host "  Command: $($process.CommandLine)" -ForegroundColor DarkGray
+            Stop-Process -Id $process.ProcessId -Force
+        }
+        Write-Host "CMD processes stopped." -ForegroundColor Green
+    } else {
+        Write-Host "No CMD processes found." -ForegroundColor Gray
+    }
+}
+
+Write-Host ""
+Write-Host "All automation processes have been terminated." -ForegroundColor Green

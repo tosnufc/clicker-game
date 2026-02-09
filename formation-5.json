@@ -2,22 +2,22 @@
   "windows": [
     {
       "title": "z-farm-2",
-      "x": -2,
-      "y": 6,
+      "x": 27,
+      "y": 0,
       "width": 1238,
       "height": 2160
     },
     {
       "title": "z-farm-3",
-      "x": 1269,
-      "y": 6,
+      "x": 1298,
+      "y": 0,
       "width": 1238,
       "height": 2160
     },
     {
       "title": "z-farm-4",
-      "x": 2546,
-      "y": 6,
+      "x": 2568,
+      "y": 0,
       "width": 1238,
       "height": 2160
     }

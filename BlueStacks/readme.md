@@ -1,6 +1,6 @@
 # BlueStacks Macro Guide for Last-Z pAq members
 
-This guide demonstrates how to use BlueStacks macro features and sync operations for automating gameplay for farm(s) and even your main Last-Z account.
+This guide demonstrates how to use BlueStacks macro features and sync operations for automating gameplay for farm account(s) and even your main Last-Z account.
 > **Note:** This guide assumes you are already familiar with BlueStacks or you have been using BlueStacks to play Last-Z.
 
 ---

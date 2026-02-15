@@ -4,7 +4,7 @@ start /min "" "%~f0" minimized
 exit
 
 :run
-cd /d D:\dev\clicker
+cd /d D:\dev\clicker-game
 call .venv\Scripts\activate.bat
 python hero_battlefield.py
 exit

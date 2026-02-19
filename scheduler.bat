@@ -20,19 +20,75 @@ for /f %%t in ('powershell -nologo -noprofile -command "Get-Date -Format HH:mm"'
 :: Skip if already launched in this minute
 if "%now%"=="%last_run%" goto wait
 
-:: Tuesday = 2
-if "%dow%"=="2" (
-    if "%now%"=="19:04" (
-        echo [%date% %time%] Launching claim_8-hrs_workflow...
-        start "" claim_8-hrs_workflow.bat
-        set "last_run=%now%"
-    )
-    if "%now%"=="19:07" (
-        echo [%date% %time%] Launching claim_8-hrs_workflow...
-        start "" claim_8-hrs_workflow.bat
-        set "last_run=%now%"
-    )
+:: ####### Claim 8-hrs workflow 3 times a day #######
+if "%now%"=="10:00" (
+    echo [%date% %time%] Launching claim_8-hrs_workflow...
+    start "" claim_8-hrs_workflow.bat
+    set "last_run=%now%"
 )
+if "%now%"=="18:00" (
+    echo [%date% %time%] Launching claim_8-hrs_workflow...
+    start "" claim_8-hrs_workflow.bat
+    set "last_run=%now%"
+)
+if "%now%"=="02:00" (
+    echo [%date% %time%] Launching claim_8-hrs_workflow...
+    start "" claim_8-hrs_workflow.bat
+    set "last_run=%now%"
+)
+:: ##################################################
+
+:: ####### Claim daily workflow once a day #######
+if "%now%"=="10:10" (
+    echo [%date% %time%] Launching claim_daily_workflow...
+    start "" claim_daily_workflow.bat
+    set "last_run=%now%"
+)
+:: ################################################
+
+:: ####### Prime Recruitment 30 workflow - weekly schedule #######
+REM Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0
+if "%dow%"=="1" if "%now%"=="02:15" (
+    echo [%date% %time%] Launching prime_recruitment_30_workflow...
+    start "" prime_recruitment_30_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="1" if "%now%"=="22:15" (
+    echo [%date% %time%] Launching prime_recruitment_30_workflow...
+    start "" prime_recruitment_30_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="2" if "%now%"=="14:15" (
+    echo [%date% %time%] Launching prime_recruitment_30_workflow...
+    start "" prime_recruitment_30_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="3" if "%now%"=="10:15" (
+    echo [%date% %time%] Launching prime_recruitment_30_workflow...
+    start "" prime_recruitment_30_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="4" if "%now%"=="18:15" (
+    echo [%date% %time%] Launching prime_recruitment_30_workflow...
+    start "" prime_recruitment_30_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="5" if "%now%"=="06:15" (
+    echo [%date% %time%] Launching prime_recruitment_30_workflow...
+    start "" prime_recruitment_30_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="6" if "%now%"=="02:15" (
+    echo [%date% %time%] Launching prime_recruitment_30_workflow...
+    start "" prime_recruitment_30_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="6" if "%now%"=="16:15" (
+    echo [%date% %time%] Launching prime_recruitment_30_workflow...
+    start "" prime_recruitment_30_workflow.bat
+    set "last_run=%now%"
+)
+:: ###############################################################
 
 :wait
 :: Wait 30 seconds before checking again

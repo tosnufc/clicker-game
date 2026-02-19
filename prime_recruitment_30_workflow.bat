@@ -20,8 +20,8 @@ python clear_login_adds.py
 echo Waiting 30 seconds...
 timeout /t 30 /nobreak >nul
 
-echo Step 3: Claim 8-hrs
-python claim_8-hrs.py
+echo Step 3: Prime Recruitment 30
+python prime_recruitment_30.py
 echo Waiting 30 seconds...
 timeout /t 30 /nobreak >nul
 

@@ -16,7 +16,7 @@ echo Waiting 30 seconds...
 timeout /t 30 /nobreak >nul
 
 echo Step 2: Claim 20
-python claim_20.py
+python claim_8-hrs.py
 echo Waiting 30 seconds...
 timeout /t 30 /nobreak >nul
 

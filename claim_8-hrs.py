@@ -11,12 +11,12 @@ import json
 pyautogui.FAILSAFE = False
 
 # Load clicks from JSON file
-with open("claim_20.json", "r") as f:
+with open("claim_8-hrs.json", "r") as f:
     data = json.load(f)
 
 clicks = data["clicks"]
 
-print(f"Loaded {len(clicks)} clicks from claim_20.json")
+print(f"Loaded {len(clicks)} clicks from claim_8-hrs.json")
 print("=" * 40)
 
 # Execute each click

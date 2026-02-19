@@ -6,5 +6,5 @@ exit
 :run
 cd /d D:\dev\clicker-game
 call .venv\Scripts\activate.bat
-python claim_20.py
+python clear_login_adds.py
 exit

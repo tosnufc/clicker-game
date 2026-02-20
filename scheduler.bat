@@ -134,6 +134,19 @@ if "%dow%"=="0" if "%now%"=="09:00" (
 )
 :: #################################################
 
+:: ####### Auto Join workflow twice a day #######
+if "%now%"=="11:59" (
+    echo [%date% %time%] Launching auto_join_workflow...
+    start "" auto_join_workflow.bat
+    set "last_run=%now%"
+)
+if "%now%"=="23:59" (
+    echo [%date% %time%] Launching auto_join_workflow...
+    start "" auto_join_workflow.bat
+    set "last_run=%now%"
+)
+:: ##############################################
+
 :wait
 :: Wait 30 seconds before checking again
 timeout /t 30 /nobreak >nul

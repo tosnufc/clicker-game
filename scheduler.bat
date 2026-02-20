@@ -90,6 +90,50 @@ if "%dow%"=="6" if "%now%"=="16:15" (
 )
 :: ###############################################################
 
+:: ####### Boomer workflow - weekly schedule #######
+REM Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0
+if "%dow%"=="1" if "%now%"=="20:00" (
+    echo [%date% %time%] Launching boomer_workflow...
+    start "" boomer_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="2" if "%now%"=="05:00" (
+    echo [%date% %time%] Launching boomer_workflow...
+    start "" boomer_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="3" if "%now%"=="01:00" (
+    echo [%date% %time%] Launching boomer_workflow...
+    start "" boomer_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="3" if "%now%"=="23:00" (
+    echo [%date% %time%] Launching boomer_workflow...
+    start "" boomer_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="4" if "%now%"=="13:00" (
+    echo [%date% %time%] Launching boomer_workflow...
+    start "" boomer_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="5" if "%now%"=="09:00" (
+    echo [%date% %time%] Launching boomer_workflow...
+    start "" boomer_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="6" if "%now%"=="13:00" (
+    echo [%date% %time%] Launching boomer_workflow...
+    start "" boomer_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="0" if "%now%"=="09:00" (
+    echo [%date% %time%] Launching boomer_workflow...
+    start "" boomer_workflow.bat
+    set "last_run=%now%"
+)
+:: #################################################
+
 :wait
 :: Wait 30 seconds before checking again
 timeout /t 30 /nobreak >nul

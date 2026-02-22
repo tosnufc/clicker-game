@@ -4,7 +4,7 @@ start /min "" "%~f0" minimized
 exit
 
 :run
-cd /d D:\dev\clicker-game
+cd /d "%~dp0"
 call .venv\Scripts\activate.bat
 python logout.py
 exit

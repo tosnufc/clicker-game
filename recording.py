@@ -7,6 +7,10 @@ from pynput import mouse, keyboard
 import pyautogui
 import time
 import json
+from screen_utils import get_scale_factor
+
+# Scale factor to normalize recorded coordinates back to reference Full HD (1920x1080)
+_scale = get_scale_factor()
 
 # Store recorded clicks
 clicks = []
@@ -34,7 +38,11 @@ def on_click(x, y, button, pressed):
         
         last_click_time = current_time
         
-        click_data = {"x": pos_x, "y": pos_y, "delay": delay}
+        # Normalize coordinates to reference Full HD (1920x1080) so JSON files
+        # work on any 16:9 screen resolution
+        ref_x = round(pos_x / _scale)
+        ref_y = round(pos_y / _scale)
+        click_data = {"x": ref_x, "y": ref_y, "delay": delay}
         clicks.append(click_data)
         print(f"Recorded click #{len(clicks)}: ({pos_x}, {pos_y}) - delay: {delay}s")
 

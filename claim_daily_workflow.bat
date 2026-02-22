@@ -25,7 +25,12 @@ python claim_daily.py
 echo Waiting 30 seconds...
 timeout /t 30 /nobreak >nul
 
-echo Step 4: Logout
+echo Step 4: Claim Blueprints
+python claim_blueprints.py
+echo Waiting 30 seconds...
+timeout /t 30 /nobreak >nul
+
+echo Step 5: Logout
 python logout.py
 
 echo Restoring volume...

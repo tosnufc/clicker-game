@@ -6,9 +6,13 @@ ctypes.windll.shcore.SetProcessDpiAwareness(2)  # PROCESS_PER_MONITOR_DPI_AWARE
 import pyautogui
 import time
 import json
+from screen_utils import get_scale_factor, scale_coords
 
 # Disable fail-safe (triggered when mouse moves to screen corner)
 pyautogui.FAILSAFE = False
+
+# Scale coordinates from reference Full HD (1920x1080) to current screen resolution
+scale = get_scale_factor()
 
 # Configuration
 REPEAT_COUNT = 10
@@ -31,8 +35,7 @@ for seq in range(1, REPEAT_COUNT + 1):
     
     # Execute each click in the sequence
     for i, click in enumerate(clicks, 1):
-        x = click["x"]
-        y = click["y"]
+        x, y = scale_coords(click["x"], click["y"], scale)
         delay = click["delay"]
         
         # Wait before click (skip delay for first click)

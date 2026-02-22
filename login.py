@@ -11,7 +11,7 @@ import os
 # Disable fail-safe (triggered when mouse moves to screen corner)
 pyautogui.FAILSAFE = False
 
-LASTZ_PATH = r"C:\Users\user\AppData\Local\Last Z\Last Z.exe"
+LASTZ_PATH = os.path.join(os.environ["LOCALAPPDATA"], "Last Z", "Last Z.exe")
 
 # Launch LastZ (using os.startfile to mimic a normal double-click launch)
 print("Launching LastZ...")

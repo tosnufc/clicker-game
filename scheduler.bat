@@ -1,6 +1,6 @@
 @echo off
 title Scheduler - 24/7 Workflow Launcher
-cd /d D:\dev\clicker-game
+cd /d "%~dp0"
 
 echo ==========================================
 echo  Scheduler started at %date% %time%

@@ -63,7 +63,7 @@ if "%dow%"=="2" if "%now%"=="14:15" (
     start "" prime_recruitment_30_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="3" if "%now%"=="10:15" (
+if "%dow%"=="3" if "%now%"=="10:20" (
     echo [%date% %time%] Launching prime_recruitment_30_workflow...
     start "" prime_recruitment_30_workflow.bat
     set "last_run=%now%"
@@ -102,32 +102,32 @@ if "%dow%"=="2" if "%now%"=="05:00" (
     start "" boomer_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="3" if "%now%"=="01:00" (
+if "%dow%"=="3" if "%now%"=="00:15" (
     echo [%date% %time%] Launching boomer_workflow...
     start "" boomer_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="3" if "%now%"=="23:00" (
+if "%dow%"=="4" if "%now%"=="00:30" (
     echo [%date% %time%] Launching boomer_workflow...
     start "" boomer_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="4" if "%now%"=="13:00" (
+if "%dow%"=="4" if "%now%"=="14:00" (
     echo [%date% %time%] Launching boomer_workflow...
     start "" boomer_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="5" if "%now%"=="09:00" (
+if "%dow%"=="5" if "%now%"=="10:00" (
     echo [%date% %time%] Launching boomer_workflow...
     start "" boomer_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="6" if "%now%"=="13:00" (
+if "%dow%"=="6" if "%now%"=="14:00" (
     echo [%date% %time%] Launching boomer_workflow...
     start "" boomer_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="0" if "%now%"=="09:00" (
+if "%dow%"=="0" if "%now%"=="10:00" (
     echo [%date% %time%] Launching boomer_workflow...
     start "" boomer_workflow.bat
     set "last_run=%now%"
@@ -146,6 +146,94 @@ if "%now%"=="23:59" (
     set "last_run=%now%"
 )
 :: ##############################################
+
+:: ####### Soldiers Popping workflow - weekly schedule #######
+REM Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0
+if "%dow%"=="2" if "%now%"=="03:30" (
+    echo [%date% %time%] Launching soldiers_popping_workflow...
+    start "" soldiers_popping_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="2" if "%now%"=="23:30" (
+    echo [%date% %time%] Launching soldiers_popping_workflow...
+    start "" soldiers_popping_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="3" if "%now%"=="15:30" (
+    echo [%date% %time%] Launching soldiers_popping_workflow...
+    start "" soldiers_popping_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="4" if "%now%"=="10:55" (
+    echo [%date% %time%] Launching soldiers_popping_workflow...
+    start "" soldiers_popping_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="5" if "%now%"=="20:30" (
+    echo [%date% %time%] Launching soldiers_popping_workflow...
+    start "" soldiers_popping_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="6" if "%now%"=="06:30" (
+    echo [%date% %time%] Launching soldiers_popping_workflow...
+    start "" soldiers_popping_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="0" if "%now%"=="03:30" (
+    echo [%date% %time%] Launching soldiers_popping_workflow...
+    start "" soldiers_popping_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="0" if "%now%"=="20:30" (
+    echo [%date% %time%] Launching soldiers_popping_workflow...
+    start "" soldiers_popping_workflow.bat
+    set "last_run=%now%"
+)
+:: ###########################################################
+
+:: ####### Soldiers Training workflow - 13hrs before each popping #######
+REM Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0
+if "%dow%"=="1" if "%now%"=="14:30" (
+    echo [%date% %time%] Launching soldiers_training_workflow...
+    start "" soldiers_training_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="2" if "%now%"=="10:30" (
+    echo [%date% %time%] Launching soldiers_training_workflow...
+    start "" soldiers_training_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="3" if "%now%"=="02:30" (
+    echo [%date% %time%] Launching soldiers_training_workflow...
+    start "" soldiers_training_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="3" if "%now%"=="22:55" (
+    echo [%date% %time%] Launching soldiers_training_workflow...
+    start "" soldiers_training_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="5" if "%now%"=="07:30" (
+    echo [%date% %time%] Launching soldiers_training_workflow...
+    start "" soldiers_training_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="5" if "%now%"=="17:30" (
+    echo [%date% %time%] Launching soldiers_training_workflow...
+    start "" soldiers_training_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="6" if "%now%"=="14:55" (
+    echo [%date% %time%] Launching soldiers_training_workflow...
+    start "" soldiers_training_workflow.bat
+    set "last_run=%now%"
+)
+if "%dow%"=="0" if "%now%"=="07:30" (
+    echo [%date% %time%] Launching soldiers_training_workflow...
+    start "" soldiers_training_workflow.bat
+    set "last_run=%now%"
+)
+:: ######################################################################
 
 :wait
 :: Wait 30 seconds before checking again

@@ -117,7 +117,7 @@ if "%dow%"=="4" if "%now%"=="14:00" (
     start "" boomer_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="5" if "%now%"=="10:00" (
+if "%dow%"=="5" if "%now%"=="10:20" (
     echo [%date% %time%] Launching boomer_workflow...
     start "" boomer_workflow.bat
     set "last_run=%now%"
@@ -127,7 +127,7 @@ if "%dow%"=="6" if "%now%"=="14:00" (
     start "" boomer_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="0" if "%now%"=="10:00" (
+if "%dow%"=="0" if "%now%"=="10:20" (
     echo [%date% %time%] Launching boomer_workflow...
     start "" boomer_workflow.bat
     set "last_run=%now%"
@@ -174,7 +174,7 @@ if "%dow%"=="5" if "%now%"=="20:30" (
     start "" soldiers_popping_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="6" if "%now%"=="06:30" (
+if "%dow%"=="6" if "%now%"=="07:30" (
     echo [%date% %time%] Launching soldiers_popping_workflow...
     start "" soldiers_popping_workflow.bat
     set "last_run=%now%"
@@ -218,7 +218,7 @@ if "%dow%"=="5" if "%now%"=="07:30" (
     start "" soldiers_training_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="5" if "%now%"=="17:30" (
+if "%dow%"=="5" if "%now%"=="20:45" (
     echo [%date% %time%] Launching soldiers_training_workflow...
     start "" soldiers_training_workflow.bat
     set "last_run=%now%"

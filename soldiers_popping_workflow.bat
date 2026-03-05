@@ -25,7 +25,12 @@ python soldiers_popping.py
 echo Waiting 30 seconds...
 timeout /t 30 /nobreak >nul
 
-echo Step 4: Logout
+echo Step 3: Soldiers Training
+python soldiers_training.py
+echo Waiting 30 seconds...
+timeout /t 30 /nobreak >nul
+
+echo Step 5: Logout
 python logout.py
 
 echo Restoring volume...

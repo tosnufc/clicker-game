@@ -191,50 +191,6 @@ if "%dow%"=="0" if "%now%"=="20:30" (
 )
 :: ###########################################################
 
-:: ####### Soldiers Training workflow - 13hrs before each popping #######
-REM Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0
-if "%dow%"=="1" if "%now%"=="14:30" (
-    echo [%date% %time%] Launching soldiers_training_workflow...
-    start "" soldiers_training_workflow.bat
-    set "last_run=%now%"
-)
-if "%dow%"=="2" if "%now%"=="10:30" (
-    echo [%date% %time%] Launching soldiers_training_workflow...
-    start "" soldiers_training_workflow.bat
-    set "last_run=%now%"
-)
-if "%dow%"=="3" if "%now%"=="02:30" (
-    echo [%date% %time%] Launching soldiers_training_workflow...
-    start "" soldiers_training_workflow.bat
-    set "last_run=%now%"
-)
-if "%dow%"=="3" if "%now%"=="22:55" (
-    echo [%date% %time%] Launching soldiers_training_workflow...
-    start "" soldiers_training_workflow.bat
-    set "last_run=%now%"
-)
-if "%dow%"=="5" if "%now%"=="07:30" (
-    echo [%date% %time%] Launching soldiers_training_workflow...
-    start "" soldiers_training_workflow.bat
-    set "last_run=%now%"
-)
-if "%dow%"=="5" if "%now%"=="20:45" (
-    echo [%date% %time%] Launching soldiers_training_workflow...
-    start "" soldiers_training_workflow.bat
-    set "last_run=%now%"
-)
-if "%dow%"=="6" if "%now%"=="14:55" (
-    echo [%date% %time%] Launching soldiers_training_workflow...
-    start "" soldiers_training_workflow.bat
-    set "last_run=%now%"
-)
-if "%dow%"=="0" if "%now%"=="07:30" (
-    echo [%date% %time%] Launching soldiers_training_workflow...
-    start "" soldiers_training_workflow.bat
-    set "last_run=%now%"
-)
-:: ######################################################################
-
 :wait
 :: Wait 30 seconds before checking again
 timeout /t 30 /nobreak >nul

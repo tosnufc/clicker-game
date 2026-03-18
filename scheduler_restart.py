@@ -24,11 +24,12 @@ if "SUCCESS" in result.stdout:
 else:
     print("No existing scheduler process found.")
 
-# Start scheduler.bat in a new visible console window
+# Start scheduler.bat in a new console that survives SSH disconnect
 CREATE_NEW_CONSOLE = 0x00000010
+CREATE_BREAKAWAY_FROM_JOB = 0x01000000
 subprocess.Popen(
     ["cmd", "/c", scheduler_path],
     cwd=script_dir,
-    creationflags=CREATE_NEW_CONSOLE,
+    creationflags=CREATE_NEW_CONSOLE | CREATE_BREAKAWAY_FROM_JOB,
 )
 print("Started scheduler.bat in a new console window.")

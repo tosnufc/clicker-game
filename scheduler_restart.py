@@ -24,12 +24,15 @@ if "SUCCESS" in result.stdout:
 else:
     print("No existing scheduler process found.")
 
-# Start scheduler.bat in a new console that survives SSH disconnect
-CREATE_NEW_CONSOLE = 0x00000010
-CREATE_BREAKAWAY_FROM_JOB = 0x01000000
-subprocess.Popen(
-    ["cmd", "/c", scheduler_path],
-    cwd=script_dir,
-    creationflags=CREATE_NEW_CONSOLE | CREATE_BREAKAWAY_FROM_JOB,
+# Start scheduler.bat via WMI (creates process outside SSH job object)
+result = subprocess.run(
+    ["powershell", "-nologo", "-noprofile", "-command",
+     f'Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList \'cmd.exe /c "{scheduler_path}"\''],
+    capture_output=True, text=True
 )
-print("Started scheduler.bat in a new console window.")
+if "ReturnValue" in result.stdout and ": 0" in result.stdout:
+    print("Started scheduler.bat successfully.")
+else:
+    print("Failed to start scheduler.bat:")
+    print(result.stdout.strip())
+    print(result.stderr.strip())

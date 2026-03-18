@@ -12,8 +12,8 @@ python mute.py
 
 echo Step 1: Login
 python login.py
-echo Waiting 30 seconds...
-timeout /t 30 /nobreak >nul
+echo Waiting 90 seconds...
+timeout /t 90 /nobreak >nul
 
 echo Step 2: Clear Login Adds
 python clear_login_adds.py

@@ -5,14 +5,14 @@ import time
 script_dir = os.path.dirname(os.path.abspath(__file__))
 scheduler_path = os.path.join(script_dir, "scheduler.bat")
 
-# Kill any existing scheduler.bat processes by window title
+# Kill any existing scheduler.bat processes by exact window title
 result = subprocess.run(
-    ["taskkill", "/f", "/fi", "WINDOWTITLE eq Administrator:  Scheduler*"],
+    ["taskkill", "/f", "/fi", "WINDOWTITLE eq Administrator:  Scheduler - 24/7 Workflow Launcher"],
     capture_output=True, text=True
 )
 if "SUCCESS" not in result.stdout:
     result = subprocess.run(
-        ["taskkill", "/f", "/fi", "WINDOWTITLE eq Scheduler*"],
+        ["taskkill", "/f", "/fi", "WINDOWTITLE eq Scheduler - 24/7 Workflow Launcher"],
         capture_output=True, text=True
     )
 print(result.stdout.strip())

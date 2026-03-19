@@ -24,15 +24,30 @@ if "SUCCESS" in result.stdout:
 else:
     print("No existing scheduler process found.")
 
-# Start scheduler.bat via WMI (creates process outside SSH job object)
-result = subprocess.run(
-    ["powershell", "-nologo", "-noprofile", "-command",
-     f'Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList \'cmd.exe /c "{scheduler_path}"\''],
+# Check if the scheduled task exists
+check = subprocess.run(
+    ["schtasks", "/query", "/tn", "ClickerScheduler"],
     capture_output=True, text=True
 )
-if "ReturnValue" in result.stdout and ": 0" in result.stdout:
-    print("Started scheduler.bat successfully.")
+if check.returncode != 0:
+    print("Task 'ClickerScheduler' not found. Running setup...")
+    subprocess.run(
+        ["schtasks", "/create", "/tn", "ClickerScheduler",
+         "/tr", scheduler_path,
+         "/sc", "onlogon",
+         "/rl", "highest",
+         "/f"],
+        capture_output=True, text=True
+    )
+
+# Start scheduler via schtasks (runs in user's interactive desktop session)
+result = subprocess.run(
+    ["schtasks", "/run", "/tn", "ClickerScheduler"],
+    capture_output=True, text=True
+)
+if "SUCCESS" in result.stdout:
+    print("Started scheduler in desktop session.")
 else:
-    print("Failed to start scheduler.bat:")
+    print("Failed to start scheduler:")
     print(result.stdout.strip())
     print(result.stderr.strip())

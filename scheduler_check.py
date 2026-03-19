@@ -1,14 +1,13 @@
 import subprocess
 
 result = subprocess.run(
-    ["tasklist", "/v", "/fi", "IMAGENAME eq cmd.exe"],
+    ["powershell", "-nologo", "-noprofile", "-command",
+     "Get-WmiObject Win32_Process -Filter \"commandline like '%scheduler.bat%'\" | Select-Object ProcessId"],
     capture_output=True, text=True
 )
 
-for line in result.stdout.splitlines():
-    if "Scheduler" in line:
-        pid = line.split()[1]
-        print(f"RUNNING (PID {pid})")
-        break
+lines = [l.strip() for l in result.stdout.splitlines() if l.strip().isdigit()]
+if lines:
+    print(f"RUNNING (PID {lines[0]})")
 else:
     print("NOT RUNNING")

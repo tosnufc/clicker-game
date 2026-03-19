@@ -7,18 +7,18 @@
   <style>
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; padding: 12px; }
-    .top { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 8px; }
-    h1 { margin: 0; font-size: 1.25rem; }
-    .hint { color: #94a3b8; font-size: 12px; margin: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; padding: 6px; }
+    .top { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 4px; }
+    h1 { margin: 0; font-size: 1rem; }
+    .hint { color: #94a3b8; font-size: 11px; margin: 0; }
     .calendar-wrap { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; background: #333; }
-    .calendar { display: grid; grid-template-columns: 48px repeat(7, 1fr); gap: 1px; padding: 1px; }
-    .cell { min-height: 22px; padding: 2px 4px; background: #16213e; font-size: 11px; }
-    .cell.header { background: #0f3460; font-weight: 600; text-align: center; padding: 4px; position: sticky; top: 0; z-index: 1; }
+    .calendar { display: grid; grid-template-columns: 40px repeat(7, 1fr); gap: 1px; padding: 1px; }
+    .cell { min-height: 14px; padding: 1px 2px; background: #16213e; font-size: 9px; }
+    .cell.header { background: #0f3460; font-weight: 600; text-align: center; padding: 2px; position: sticky; top: 0; z-index: 1; font-size: 9px; line-height: 1.1; }
     .cell.header.corner { left: 0; z-index: 2; }
-    .cell.time { background: #0f3460; font-size: 10px; padding: 2px 4px; position: sticky; left: 0; z-index: 1; }
-    .cell.droppable { min-height: 24px; }
-    .chip { display: inline-block; padding: 2px 6px; margin: 1px; border-radius: 3px; font-size: 10px; cursor: grab; user-select: none; }
+    .cell.time { background: #0f3460; font-size: 9px; padding: 1px 2px; position: sticky; left: 0; z-index: 1; }
+    .cell.droppable { min-height: 16px; }
+    .chip { display: inline-block; padding: 1px 4px; margin: 0 1px; border-radius: 2px; font-size: 8px; cursor: grab; user-select: none; }
     .chip:active { cursor: grabbing; }
     .chip.dragging { opacity: 0.5; }
     .chip.claim_8-hrs { background: #e94560; }
@@ -28,13 +28,19 @@
     .chip.auto_join { background: #f4a261; color: #1a1a2e; }
     .chip.soldiers_popping { background: #457b9d; }
     .chip.soldiers_training { background: #6a4c93; }
-    .actions { flex-shrink: 0; display: flex; gap: 8px; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #333; }
-    button { padding: 6px 14px; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; }
+    .prep-label { font-size: 8px; color: #2d3748; margin-bottom: 0; line-height: 1.1; }
+    .prep-shelter { background: #7eb8da !important; }
+    .prep-science { background: #8fcf9a !important; }
+    .prep-vehicle { background: #e8c97a !important; }
+    .prep-hero { background: #e8a4c4 !important; }
+    .prep-army { background: #c4a4e8 !important; }
+    .actions { flex-shrink: 0; display: flex; gap: 6px; align-items: center; margin-top: 4px; padding-top: 4px; border-top: 1px solid #333; }
+    button { padding: 4px 10px; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; }
     button.save { background: #2d6a4f; color: white; }
     button.save:hover { background: #40916c; }
     button.exit { background: #e94560; color: white; }
     button.exit:hover { background: #ff6b6b; }
-    .status { color: #94a3b8; font-size: 12px; }
+    .status { color: #94a3b8; font-size: 11px; }
     .status.ok { color: #2d6a4f; }
     .status.err { color: #e94560; }
   </style>
@@ -42,7 +48,7 @@
 <body>
   <div class="top">
     <h1>Scheduler Calendar</h1>
-    <p class="hint">Drag workflows to move them. Day: Sun=0, Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6.</p>
+    <p class="hint">Drag workflows to move them. Day: Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0.</p>
   </div>
   <div class="calendar-wrap">
     <div class="calendar" id="calendar"></div>
@@ -63,8 +69,43 @@
       'soldiers_popping': 'soldiers_popping_workflow.bat',
       'soldiers_training': 'soldiers_training_workflow.bat'
     };
-    const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const VERSUS = { 1:'Mod Vehicle Boost', 2:'Shelter Upgrade', 3:'Age of Science', 4:'Hero Initiative', 5:'Holistic Growth', 6:'Enemy Buster', 0:'N/A' };
+    const PREP_EVENTS = {
+      1: {'09:00':'Shelter Upgrade','13:00':'Age of Science','17:00':'Mod Vehicle Boost','21:00':'Hero Initiative','01:00':'Army Expansion','05:00':'Mod Vehicle Boost'},
+      2: {'09:00':'Age of Science','13:00':'Hero Initiative','17:00':'Shelter Upgrade','21:00':'Army Expansion','01:00':'Mod Vehicle Boost','05:00':'Shelter Upgrade'},
+      3: {'09:00':'Hero Initiative','13:00':'Army Expansion','17:00':'Age of Science','21:00':'Mod Vehicle Boost','01:00':'Shelter Upgrade','05:00':'Age of Science'},
+      4: {'09:00':'Army Expansion','13:00':'Mod Vehicle Boost','17:00':'Hero Initiative','21:00':'Shelter Upgrade','01:00':'Age of Science','05:00':'Hero Initiative'},
+      5: {'09:00':'Mod Vehicle Boost','13:00':'Shelter Upgrade','17:00':'Army Expansion','21:00':'Age of Science','01:00':'Hero Initiative','05:00':'Army Expansion'},
+      6: {'09:00':'Age of Science','13:00':'Mod Vehicle Boost','17:00':'Hero Initiative','21:00':'Shelter Upgrade','01:00':'Army Expansion','05:00':'Hero Initiative'},
+      0: {'09:00':'Mod Vehicle Boost','13:00':'Shelter Upgrade','17:00':'Army Expansion','21:00':'Age of Science','01:00':'Hero Initiative','05:00':'Army Expansion'}
+    };
     let data = { workflows: [] };
+
+    const PREP_COLORS = {
+      'Shelter Upgrade': 'prep-shelter',
+      'Age of Science': 'prep-science',
+      'Mod Vehicle Boost': 'prep-vehicle',
+      'Hero Initiative': 'prep-hero',
+      'Army Expansion': 'prep-army'
+    };
+
+    function getBlockStart(timeStr) {
+      const [h, m] = timeStr.split(':').map(Number);
+      const mins = h * 60 + m;
+      if (mins < 60) return '21:00';
+      if (mins < 300) return '01:00';
+      if (mins < 540) return '05:00';
+      if (mins < 780) return '09:00';
+      if (mins < 1020) return '13:00';
+      if (mins < 1260) return '17:00';
+      return '21:00';
+    }
+
+    function getPrepEvent(day, timeStr) {
+      const block = getBlockStart(timeStr);
+      return PREP_EVENTS[day] && PREP_EVENTS[day][block];
+    }
 
     function parseTime(t) {
       const [h, m] = t.split(':').map(Number);
@@ -279,16 +320,18 @@
       const cal = document.getElementById('calendar');
       cal.innerHTML = '';
       cal.style.display = 'grid';
-      cal.style.gridTemplateColumns = '48px repeat(7, 1fr)';
+      cal.style.gridTemplateColumns = '40px repeat(7, 1fr)';
       const times = [];
-      for (let m = 0; m < 24 * 60; m += 30) times.push(formatTime(m));
+      for (let m = 9 * 60; m < 24 * 60; m += 30) times.push(formatTime(m));
+      for (let m = 0; m < 9 * 60; m += 30) times.push(formatTime(m));
       const corner = document.createElement('div');
       corner.className = 'cell header corner';
       cal.appendChild(corner);
-      DAYS.forEach(d => {
+      DAYS.forEach((d, i) => {
         const h = document.createElement('div');
         h.className = 'cell header';
-        h.textContent = d;
+        const day = (i + 1) % 7;
+        h.textContent = d + ' - ' + (VERSUS[day] || '');
         cal.appendChild(h);
       });
       times.forEach(timeStr => {
@@ -296,11 +339,23 @@
         tc.className = 'cell time';
         tc.textContent = timeStr;
         cal.appendChild(tc);
-        for (let day = 0; day < 7; day++) {
+        for (let col = 0; col < 7; col++) {
+          const day = (col + 1) % 7;
           const cell = document.createElement('div');
           cell.className = 'cell droppable';
           cell.dataset.day = day;
           cell.dataset.time = timeStr;
+          const prep = getPrepEvent(day, timeStr);
+          if (prep) {
+            const colorClass = PREP_COLORS[prep];
+            if (colorClass) cell.classList.add(colorClass);
+            if (timeStr === getBlockStart(timeStr)) {
+              const lbl = document.createElement('div');
+              lbl.className = 'prep-label';
+              lbl.textContent = prep;
+              cell.appendChild(lbl);
+            }
+          }
           data.workflows.filter(w =>
             w.day === day && w.time === timeStr
           ).forEach(w => {

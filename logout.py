@@ -3,9 +3,11 @@ import ctypes
 # This must be called BEFORE importing pyautogui
 ctypes.windll.shcore.SetProcessDpiAwareness(2)  # PROCESS_PER_MONITOR_DPI_AWARE
 
+import os
 import pyautogui
 import time
 import json
+import subprocess
 import pygetwindow as gw
 from screen_utils import get_scale_factor, scale_coords
 
@@ -62,11 +64,42 @@ if windows:
 pyautogui.hotkey("alt", "F4")
 time.sleep(5)
 
-# Verify the game has closed
+# Verify the game has closed; if still running, force terminate
 windows = gw.getWindowsWithTitle("LastZ")
 if not windows:
     print("LastZ closed successfully.")
 else:
-    print("LastZ is still running - it may need a confirmation click to close.")
+    print("LastZ is still running - force terminating process...")
+    hwnd = int(windows[0]._hWnd)
+    pid = ctypes.c_ulong(0)
+    ctypes.windll.user32.GetWindowThreadProcessId(ctypes.c_void_p(hwnd), ctypes.byref(pid))
+    process_id = pid.value
+    print(f"Terminating PID {process_id}...")
+
+    # Method 1: Use Windows API TerminateProcess directly
+    PROCESS_TERMINATE = 0x0001
+    kernel32 = ctypes.windll.kernel32
+    handle = kernel32.OpenProcess(PROCESS_TERMINATE, False, process_id)
+    if handle:
+        if kernel32.TerminateProcess(handle, 0):
+            kernel32.CloseHandle(handle)
+            time.sleep(1)
+        else:
+            kernel32.CloseHandle(handle)
+            # Method 2: Fallback to taskkill with /T (kill process tree)
+            taskkill = os.path.join(os.environ.get("SystemRoot", "C:\\Windows"), "System32", "taskkill.exe")
+            subprocess.run([taskkill, "/PID", str(process_id), "/F", "/T"], check=False, capture_output=True)
+            time.sleep(1)
+    else:
+        # OpenProcess failed (e.g. permission denied) - try taskkill
+        taskkill = os.path.join(os.environ.get("SystemRoot", "C:\\Windows"), "System32", "taskkill.exe")
+        subprocess.run([taskkill, "/PID", str(process_id), "/F", "/T"], check=False, capture_output=True)
+        time.sleep(1)
+
+    windows = gw.getWindowsWithTitle("LastZ")
+    if not windows:
+        print("LastZ process terminated.")
+    else:
+        print("Warning: LastZ may still be running.")
 
 print("Logout sequence completed!")

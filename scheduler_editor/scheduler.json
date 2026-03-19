@@ -1,0 +1,232 @@
+{
+  "workflows": [
+    {
+      "workflow": "claim_8-hrs",
+      "bat": "claim_8-hrs_workflow.bat",
+      "day": null,
+      "time": "02:00"
+    },
+    {
+      "workflow": "claim_8-hrs",
+      "bat": "claim_8-hrs_workflow.bat",
+      "day": null,
+      "time": "10:00"
+    },
+    {
+      "workflow": "claim_8-hrs",
+      "bat": "claim_8-hrs_workflow.bat",
+      "day": null,
+      "time": "18:00"
+    },
+    {
+      "workflow": "claim_daily",
+      "bat": "claim_daily_workflow.bat",
+      "day": null,
+      "time": "10:10"
+    },
+    {
+      "workflow": "prime_recruitment_30",
+      "bat": "prime_recruitment_30_workflow.bat",
+      "day": 1,
+      "time": "02:15"
+    },
+    {
+      "workflow": "prime_recruitment_30",
+      "bat": "prime_recruitment_30_workflow.bat",
+      "day": 6,
+      "time": "02:15"
+    },
+    {
+      "workflow": "prime_recruitment_30",
+      "bat": "prime_recruitment_30_workflow.bat",
+      "day": 1,
+      "time": "22:15"
+    },
+    {
+      "workflow": "prime_recruitment_30",
+      "bat": "prime_recruitment_30_workflow.bat",
+      "day": 2,
+      "time": "14:15"
+    },
+    {
+      "workflow": "prime_recruitment_30",
+      "bat": "prime_recruitment_30_workflow.bat",
+      "day": 3,
+      "time": "10:20"
+    },
+    {
+      "workflow": "prime_recruitment_30",
+      "bat": "prime_recruitment_30_workflow.bat",
+      "day": 4,
+      "time": "18:15"
+    },
+    {
+      "workflow": "prime_recruitment_30",
+      "bat": "prime_recruitment_30_workflow.bat",
+      "day": 5,
+      "time": "06:15"
+    },
+    {
+      "workflow": "prime_recruitment_30",
+      "bat": "prime_recruitment_30_workflow.bat",
+      "day": 6,
+      "time": "16:15"
+    },
+    {
+      "workflow": "boomer",
+      "bat": "boomer_workflow.bat",
+      "day": 1,
+      "time": "20:00"
+    },
+    {
+      "workflow": "boomer",
+      "bat": "boomer_workflow.bat",
+      "day": 2,
+      "time": "05:00"
+    },
+    {
+      "workflow": "boomer",
+      "bat": "boomer_workflow.bat",
+      "day": 3,
+      "time": "00:15"
+    },
+    {
+      "workflow": "boomer",
+      "bat": "boomer_workflow.bat",
+      "day": 4,
+      "time": "00:30"
+    },
+    {
+      "workflow": "boomer",
+      "bat": "boomer_workflow.bat",
+      "day": 4,
+      "time": "14:00"
+    },
+    {
+      "workflow": "boomer",
+      "bat": "boomer_workflow.bat",
+      "day": 6,
+      "time": "14:00"
+    },
+    {
+      "workflow": "boomer",
+      "bat": "boomer_workflow.bat",
+      "day": 5,
+      "time": "10:20"
+    },
+    {
+      "workflow": "boomer",
+      "bat": "boomer_workflow.bat",
+      "day": 0,
+      "time": "10:20"
+    },
+    {
+      "workflow": "auto_join",
+      "bat": "auto_join_workflow.bat",
+      "day": null,
+      "time": "11:59"
+    },
+    {
+      "workflow": "auto_join",
+      "bat": "auto_join_workflow.bat",
+      "day": null,
+      "time": "23:59"
+    },
+    {
+      "workflow": "soldiers_popping",
+      "bat": "soldiers_popping_workflow.bat",
+      "day": 2,
+      "time": "03:30"
+    },
+    {
+      "workflow": "soldiers_popping",
+      "bat": "soldiers_popping_workflow.bat",
+      "day": 0,
+      "time": "03:30"
+    },
+    {
+      "workflow": "soldiers_popping",
+      "bat": "soldiers_popping_workflow.bat",
+      "day": 2,
+      "time": "23:30"
+    },
+    {
+      "workflow": "soldiers_popping",
+      "bat": "soldiers_popping_workflow.bat",
+      "day": 3,
+      "time": "15:30"
+    },
+    {
+      "workflow": "soldiers_popping",
+      "bat": "soldiers_popping_workflow.bat",
+      "day": 4,
+      "time": "10:55"
+    },
+    {
+      "workflow": "soldiers_popping",
+      "bat": "soldiers_popping_workflow.bat",
+      "day": 5,
+      "time": "20:30"
+    },
+    {
+      "workflow": "soldiers_popping",
+      "bat": "soldiers_popping_workflow.bat",
+      "day": 0,
+      "time": "20:30"
+    },
+    {
+      "workflow": "soldiers_popping",
+      "bat": "soldiers_popping_workflow.bat",
+      "day": 6,
+      "time": "07:30"
+    },
+    {
+      "workflow": "soldiers_training",
+      "bat": "soldiers_training_workflow.bat",
+      "day": 1,
+      "time": "14:30"
+    },
+    {
+      "workflow": "soldiers_training",
+      "bat": "soldiers_training_workflow.bat",
+      "day": 2,
+      "time": "10:30"
+    },
+    {
+      "workflow": "soldiers_training",
+      "bat": "soldiers_training_workflow.bat",
+      "day": 3,
+      "time": "02:30"
+    },
+    {
+      "workflow": "soldiers_training",
+      "bat": "soldiers_training_workflow.bat",
+      "day": 3,
+      "time": "22:55"
+    },
+    {
+      "workflow": "soldiers_training",
+      "bat": "soldiers_training_workflow.bat",
+      "day": 5,
+      "time": "07:30"
+    },
+    {
+      "workflow": "soldiers_training",
+      "bat": "soldiers_training_workflow.bat",
+      "day": 0,
+      "time": "07:30"
+    },
+    {
+      "workflow": "soldiers_training",
+      "bat": "soldiers_training_workflow.bat",
+      "day": 5,
+      "time": "20:45"
+    },
+    {
+      "workflow": "soldiers_training",
+      "bat": "soldiers_training_workflow.bat",
+      "day": 6,
+      "time": "14:55"
+    }
+  ]
+}

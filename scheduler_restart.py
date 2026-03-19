@@ -6,21 +6,16 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 scheduler_path = os.path.join(script_dir, "scheduler.bat")
 task_name = "ClickerScheduler"
 
-# Kill any existing scheduler.bat processes by exact window title
+# Kill any existing scheduler.bat processes via WMI (works across sessions)
 result = subprocess.run(
-    ["taskkill", "/f", "/fi", "WINDOWTITLE eq Administrator:  Scheduler - 24/7 Workflow Launcher"],
+    ["powershell", "-nologo", "-noprofile", "-command",
+     "Get-WmiObject Win32_Process -Filter \"commandline like '%scheduler.bat%' and name='cmd.exe'\" | ForEach-Object { $_.Terminate() | Out-Null; Write-Output $_.ProcessId }"],
     capture_output=True, text=True
 )
-if "SUCCESS" not in result.stdout:
-    result = subprocess.run(
-        ["taskkill", "/f", "/fi", "WINDOWTITLE eq Scheduler - 24/7 Workflow Launcher"],
-        capture_output=True, text=True
-    )
-print(result.stdout.strip())
-print(result.stderr.strip())
-
-if "SUCCESS" in result.stdout:
-    print("Killed existing scheduler process. Waiting 3 seconds...")
+killed = [l.strip() for l in result.stdout.splitlines() if l.strip().isdigit()]
+if killed:
+    print(f"Killed {len(killed)} scheduler process(es): PID {', '.join(killed)}")
+    print("Waiting 3 seconds...")
     time.sleep(3)
 else:
     print("No existing scheduler process found.")

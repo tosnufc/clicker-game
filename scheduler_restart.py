@@ -4,6 +4,7 @@ import time
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 scheduler_path = os.path.join(script_dir, "scheduler.bat")
+task_name = "ClickerScheduler"
 
 # Kill any existing scheduler.bat processes by exact window title
 result = subprocess.run(
@@ -24,28 +25,23 @@ if "SUCCESS" in result.stdout:
 else:
     print("No existing scheduler process found.")
 
-# Check if the scheduled task exists
-check = subprocess.run(
-    ["schtasks", "/query", "/tn", "ClickerScheduler"],
-    capture_output=True, text=True
-)
-if check.returncode != 0:
-    print("Task 'ClickerScheduler' not found. Running setup...")
-    subprocess.run(
-        ["schtasks", "/create", "/tn", "ClickerScheduler",
-         "/tr", scheduler_path,
-         "/sc", "onlogon",
-         "/rl", "highest",
-         "/f"],
-        capture_output=True, text=True
-    )
+# Register and start the scheduled task via PowerShell for full control
+ps_script = f'''
+$action = New-ScheduledTaskAction -Execute "{scheduler_path}" -WorkingDirectory "{script_dir}"
+$trigger = New-ScheduledTaskTrigger -AtLogOn
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero)
+$principal = New-ScheduledTaskPrincipal -UserId "$env:USERNAME" -LogonType Interactive -RunLevel Highest
+Register-ScheduledTask -TaskName "{task_name}" -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force | Out-Null
+Start-ScheduledTask -TaskName "{task_name}"
+Write-Output "OK"
+'''
 
-# Start scheduler via schtasks (runs in user's interactive desktop session)
 result = subprocess.run(
-    ["schtasks", "/run", "/tn", "ClickerScheduler"],
+    ["powershell", "-nologo", "-noprofile", "-command", ps_script],
     capture_output=True, text=True
 )
-if "SUCCESS" in result.stdout:
+
+if "OK" in result.stdout:
     print("Started scheduler in desktop session.")
 else:
     print("Failed to start scheduler:")

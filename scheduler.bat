@@ -156,7 +156,7 @@ if "%now%"=="23:59" (
     start "" auto_join_workflow.bat
     set "last_run=%now%"
 )
-if "%dow%"=="4" if "%now%"=="18:55" (
+if "%dow%"=="4" if "%now%"=="19:03" (
     call :log "Launching auto_join_workflow..."
     start "" auto_join_workflow.bat
     set "last_run=%now%"

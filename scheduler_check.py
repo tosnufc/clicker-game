@@ -29,17 +29,19 @@ if os.path.exists(result_file):
 detect_script = f"""
 import win32gui
 dialogs = []
+def is_dialog(t):
+    return 'is running' in t.lower()
 def ec(h, _):
     t = win32gui.GetWindowText(h)
-    if 'game is running' in t.lower(): dialogs.append(t)
+    if is_dialog(t): dialogs.append(t)
 def et(h, _):
     t = win32gui.GetWindowText(h)
-    if 'game is running' in t.lower(): dialogs.append(t)
+    if is_dialog(t): dialogs.append(t)
     try: win32gui.EnumChildWindows(h, ec, None)
     except: pass
 win32gui.EnumWindows(et, None)
 with open(r'{result_file}', 'w') as f:
-    f.write(str(len(dialogs)))
+    f.write('\\n'.join(dialogs) if dialogs else '0')
 """
 
 detect_script_path = os.path.join(tempfile.gettempdir(), "dialog_detect.py")
@@ -66,9 +68,11 @@ for _ in range(16):
 
 if os.path.exists(result_file):
     with open(result_file) as f:
-        count = int(f.read().strip() or "0")
-    if count > 0:
-        print(f"Dialogs: {count} 'Game Is Running' dialog(s) found!")
+        content = f.read().strip()
+    dialogs = [d for d in content.splitlines() if d and d != "0"]
+    if dialogs:
+        for d in dialogs:
+            print(f"Dialogs: '{d}' found!")
     else:
         print("Dialogs: none")
 else:

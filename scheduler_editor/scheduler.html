@@ -5,42 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Scheduler Calendar</title>
   <style>
+    :root { --line-color: #fff; --line-width: 1px; }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; padding: 6px; }
-    .top { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 4px; }
-    h1 { margin: 0; font-size: 1rem; }
-    .hint { color: #94a3b8; font-size: 11px; margin: 0; }
-    .calendar-wrap { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; background: #333; }
-    .calendar { display: grid; grid-template-columns: 40px repeat(7, 1fr); gap: 1px; padding: 1px; }
-    .cell { min-height: 14px; padding: 1px 2px; background: #16213e; font-size: 9px; }
-    .cell.header { background: #0f3460; font-weight: 600; text-align: center; padding: 2px; position: sticky; top: 0; z-index: 1; font-size: 9px; line-height: 1.1; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; padding: 4px; }
+    .top { flex-shrink: 0; display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+    .top h1 { flex-shrink: 0; }
+    .palette { flex: 1; margin: 0; }
+    .top-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    h1 { margin: 0; font-size: 0.9rem; }
+    .hint { color: #94a3b8; font-size: 10px; margin: 0; }
+    .calendar-wrap { flex: 1; min-height: 0; overflow: auto; border-radius: 8px; }
+    .calendar { display: grid; grid-template-columns: 36px repeat(7, 1fr); column-gap: var(--line-width); row-gap: var(--line-width); padding: 0; background: var(--line-color); }
+    .cell { min-height: 11px; padding: 0 2px; background: #252d42; font-size: 8px; }
+    .cell.header { background: #0f3460; font-weight: 600; text-align: center; padding: 1px; position: sticky; top: 0; z-index: 1; font-size: 8px; line-height: 1.1; }
     .cell.header.corner { left: 0; z-index: 2; }
-    .cell.time { background: #0f3460; font-size: 9px; padding: 1px 2px; position: sticky; left: 0; z-index: 1; }
-    .cell.droppable { min-height: 16px; }
-    .chip { display: inline-block; padding: 1px 4px; margin: 0 1px; border-radius: 2px; font-size: 8px; cursor: grab; user-select: none; }
+    .cell.time { background: #0f3460; font-size: 8px; padding: 0 1px; position: sticky; left: 0; z-index: 1; }
+    .cell.droppable { min-height: 12px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 1px; }
+    .chip { display: inline-block; padding: 0 3px; margin: 0; border-radius: 1px; font-size: 7px; cursor: grab; user-select: none; order: 1; }
     .chip:active { cursor: grabbing; }
     .chip.dragging { opacity: 0.5; }
+    .chip { position: relative; }
+    .chip-del { display: none; margin-left: 2px; padding: 0 2px; cursor: pointer; font-size: 10px; color: #fff; opacity: 0.8; }
+    .chip:hover .chip-del { display: inline; }
+    .chip-del:hover { opacity: 1; }
     .chip.claim_8-hrs { background: #e94560; }
     .chip.claim_daily { background: #533483; }
-    .chip.prime_recruitment_30 { background: #0f3460; }
+    .chip.prime_recruitment_30 { background: #5a9fd4; }
     .chip.boomer { background: #2d6a4f; }
     .chip.auto_join { background: #f4a261; color: #1a1a2e; }
     .chip.soldiers_popping { background: #457b9d; }
-    .chip.soldiers_training { background: #6a4c93; }
-    .prep-label { font-size: 8px; color: #2d3748; margin-bottom: 0; line-height: 1.1; }
-    .prep-shelter { background: #7eb8da !important; }
-    .prep-science { background: #8fcf9a !important; }
-    .prep-vehicle { background: #e8c97a !important; }
-    .prep-hero { background: #e8a4c4 !important; }
-    .prep-army { background: #c4a4e8 !important; }
-    .actions { flex-shrink: 0; display: flex; gap: 6px; align-items: center; margin-top: 4px; padding-top: 4px; border-top: 1px solid #333; }
-    button { padding: 4px 10px; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; }
+    .prep-label { font-size: 7px; color: #2d3748; margin-bottom: 0; line-height: 1; font-weight: bold; margin-left: auto; text-align: right; order: 2; }
+    .prep-shelter { background: #a8d4ed !important; }
+    .prep-science { background: #b8e5c4 !important; }
+    .prep-vehicle { background: #f0e0a8 !important; }
+    .prep-hero { background: #f0c4dc !important; }
+    .prep-army { background: #dcc4f0 !important; }
+    .palette { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 4px 8px; background: #0f3460; border-radius: 4px; }
+    .palette-label { font-size: 9px; color: #94a3b8; margin-right: 4px; }
+    .palette .chip { cursor: grab; }
+    button { padding: 3px 8px; border: none; border-radius: 3px; font-size: 10px; cursor: pointer; }
     button.save { background: #2d6a4f; color: white; }
     button.save:hover { background: #40916c; }
     button.exit { background: #e94560; color: white; }
     button.exit:hover { background: #ff6b6b; }
-    .status { color: #94a3b8; font-size: 11px; }
+    .status { color: #94a3b8; font-size: 10px; }
     .status.ok { color: #2d6a4f; }
     .status.err { color: #e94560; }
   </style>
@@ -48,15 +57,15 @@
 <body>
   <div class="top">
     <h1>Scheduler Calendar</h1>
-    <p class="hint">Drag workflows to move them. Day: Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=0.</p>
+    <div class="palette" id="palette"></div>
+    <div class="top-right">
+      <button class="save" onclick="save()">Save</button>
+      <button class="exit" onclick="exitServer()">Exit</button>
+      <span class="status" id="status"></span>
+    </div>
   </div>
   <div class="calendar-wrap">
     <div class="calendar" id="calendar"></div>
-  </div>
-  <div class="actions">
-    <button class="save" onclick="save()">Save to scheduler.json</button>
-    <button class="exit" onclick="exitServer()">Exit</button>
-    <span class="status" id="status"></span>
   </div>
 
   <script>
@@ -66,8 +75,7 @@
       'prime_recruitment_30': 'prime_recruitment_30_workflow.bat',
       'boomer': 'boomer_workflow.bat',
       'auto_join': 'auto_join_workflow.bat',
-      'soldiers_popping': 'soldiers_popping_workflow.bat',
-      'soldiers_training': 'soldiers_training_workflow.bat'
+      'soldiers_popping': 'soldiers_popping_workflow.bat'
     };
     const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     const VERSUS = { 1:'Mod Vehicle Boost', 2:'Shelter Upgrade', 3:'Age of Science', 4:'Hero Initiative', 5:'Holistic Growth', 6:'Enemy Buster', 0:'N/A' };
@@ -116,6 +124,21 @@
       return `${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
     }
 
+    function renderPalette() {
+      const palette = document.getElementById('palette');
+      palette.innerHTML = '<span class="palette-label">Workflows:</span>';
+      Object.keys(BAT_MAP).forEach(workflow => {
+        const chip = document.createElement('span');
+        chip.className = `chip ${workflow}`;
+        chip.textContent = workflow;
+        chip.draggable = true;
+        chip.dataset.workflow = workflow;
+        chip.dataset.bat = BAT_MAP[workflow];
+        chip.addEventListener('dragstart', onDragStart);
+        palette.appendChild(chip);
+      });
+    }
+
     function load() {
       fetch('scheduler.json?t=' + Date.now()).then(r => r.json()).then(d => {
         data = d;
@@ -131,9 +154,11 @@
           }
         });
         data.workflows = expanded;
+        renderPalette();
         render();
       }).catch(() => {
         data = { workflows: [] };
+        renderPalette();
         render();
       });
     }
@@ -239,13 +264,14 @@
 
     let dragData = null;
     function onDragStart(e) {
-      const chip = e.target;
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
       dragData = {
-        id: chip.dataset.id,
+        id: chip.dataset.id || null,
         workflow: chip.dataset.workflow,
         bat: chip.dataset.bat,
-        day: chip.dataset.day === 'all' ? null : parseInt(chip.dataset.day),
-        time: chip.dataset.time
+        day: chip.dataset.day !== undefined ? (chip.dataset.day === 'all' ? null : parseInt(chip.dataset.day)) : null,
+        time: chip.dataset.time || null
       };
       chip.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
@@ -261,13 +287,19 @@
       if (!dragData) return;
       const day = parseInt(e.currentTarget.dataset.day);
       const time = e.currentTarget.dataset.time;
-      const idx = data.workflows.findIndex(w => w.id === dragData.id);
-      if (idx >= 0) {
-        data.workflows[idx] = {
-          ...data.workflows[idx],
+      if (dragData.id != null) {
+        const idx = data.workflows.findIndex(w => w.id === dragData.id);
+        if (idx >= 0) {
+          data.workflows[idx] = { ...data.workflows[idx], day: day, time: time };
+        }
+      } else {
+        data.workflows.push({
+          id: `w${Date.now()}`,
+          workflow: dragData.workflow,
+          bat: dragData.bat,
           day: day,
           time: time
-        };
+        });
       }
       dragData = null;
       render();
@@ -320,7 +352,7 @@
       const cal = document.getElementById('calendar');
       cal.innerHTML = '';
       cal.style.display = 'grid';
-      cal.style.gridTemplateColumns = '40px repeat(7, 1fr)';
+      cal.style.gridTemplateColumns = '36px repeat(7, 1fr)';
       const times = [];
       for (let m = 9 * 60; m < 24 * 60; m += 30) times.push(formatTime(m));
       for (let m = 0; m < 9 * 60; m += 30) times.push(formatTime(m));
@@ -361,7 +393,7 @@
           ).forEach(w => {
             const chip = document.createElement('span');
             chip.className = `chip ${w.workflow}`;
-            chip.textContent = w.workflow;
+            chip.innerHTML = w.workflow + '<span class="chip-del" title="Delete">×</span>';
             chip.draggable = true;
             chip.dataset.id = w.id;
             chip.dataset.workflow = w.workflow;
@@ -369,6 +401,13 @@
             chip.dataset.day = w.day === null ? 'all' : String(w.day);
             chip.dataset.time = w.time;
             chip.addEventListener('dragstart', onDragStart);
+            chip.querySelector('.chip-del').addEventListener('mousedown', (e) => e.stopPropagation());
+            chip.querySelector('.chip-del').addEventListener('click', (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              const idx = data.workflows.findIndex(x => x.id === w.id);
+              if (idx >= 0) { data.workflows.splice(idx, 1); render(); }
+            });
             cell.appendChild(chip);
           });
           cell.addEventListener('dragover', onDragOver);

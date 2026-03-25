@@ -70,6 +70,30 @@
     .status.saved.sync-fail { color: #fff; background: rgba(233, 69, 96, 0.22); }
     .status.ok { color: #fff; background: rgba(45, 106, 79, 0.25); }
     .status.err { color: #e94560; background: rgba(233, 69, 96, 0.22); }
+    .tz-wrap {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+      font-size: 7px;
+      color: #94a3b8;
+    }
+    .tz-wrap select {
+      width: auto;
+      max-width: 30ch;
+      min-width: 0;
+      padding: 1px 2px;
+      font-size: 7px;
+      line-height: 1.2;
+      border-radius: 2px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      box-sizing: border-box;
+    }
+    .tz-wrap select option {
+      font-size: 7px;
+    }
   </style>
 </head>
 <body>
@@ -77,6 +101,9 @@
     <h1>Scheduler Calendar</h1>
     <div class="palette" id="palette"></div>
     <div class="top-right">
+      <label class="tz-wrap">Timezone
+        <select id="tzDisplay" title="Display timezone (view-only; does not change scheduler.json)"></select>
+      </label>
       <button class="save" onclick="save()">Save</button>
       <button class="exit" onclick="exitServer()">Exit</button>
       <span class="status" id="status"></span>
@@ -142,6 +169,147 @@
       return `${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
     }
 
+    const LS_REF_TZ = 'scheduler_ref_tz';
+    const LS_DISPLAY_TZ = 'scheduler_display_tz';
+
+    function getRefTz() {
+      let r = localStorage.getItem(LS_REF_TZ);
+      if (!r) {
+        r = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        localStorage.setItem(LS_REF_TZ, r);
+      }
+      return r;
+    }
+
+    function getDisplayTz() {
+      const sel = document.getElementById('tzDisplay');
+      if (sel && sel.value) return sel.value;
+      return localStorage.getItem(LS_DISPLAY_TZ) || getRefTz();
+    }
+
+    function ymdInTz(ms, tz) {
+      return new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms));
+    }
+
+    function hmInTz(ms, tz) {
+      const s = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(ms));
+      const parts = s.match(/(\d{1,2}):(\d{2})/);
+      if (!parts) return s;
+      return `${String(parts[1]).padStart(2, '0')}:${parts[2]}`;
+    }
+
+    function hmToMinutes(hhmm) {
+      const [h, m] = hhmm.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function getYmdPartsInTz(tz) {
+      const s = ymdInTz(Date.now(), tz);
+      return s.split('-').map(Number);
+    }
+
+    /** UTC ms where wall clock in `tz` is hh:mm on (y, mo, d). */
+    function findUtcForWallClock(y, mo, d, hhmm, tz) {
+      const target = hmToMinutes(hhmm);
+      const want = `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      let lo = Date.UTC(y, mo - 1, d - 1);
+      let hi = Date.UTC(y, mo - 1, d + 2);
+      for (let iter = 0; iter < 56; iter++) {
+        const mid = Math.floor((lo + hi) / 2);
+        const dayStr = ymdInTz(mid, tz);
+        const hm = hmInTz(mid, tz);
+        const cur = hmToMinutes(hm);
+        if (dayStr < want) {
+          lo = mid + 1;
+          continue;
+        }
+        if (dayStr > want) {
+          hi = mid - 1;
+          continue;
+        }
+        if (cur < target) lo = mid + 1;
+        else if (cur > target) hi = mid - 1;
+        else return mid;
+      }
+      return Math.floor((lo + hi) / 2);
+    }
+
+    /** Label for left column only; `canonicalHHMM` stays the scheduler.json value. */
+    function displayTimeLabel(canonicalHHMM) {
+      const refTz = getRefTz();
+      const dispTz = getDisplayTz();
+      if (refTz === dispTz) return canonicalHHMM;
+      try {
+        const [y, mo, d] = getYmdPartsInTz(refTz);
+        const utcMs = findUtcForWallClock(y, mo, d, canonicalHHMM, refTz);
+        return hmInTz(utcMs, dispTz);
+      } catch (_) {
+        return canonicalHHMM;
+      }
+    }
+
+    /** e.g. GMT+9, GMT-5, GMT+05:30 — from Intl (current date, reflects DST). */
+    function formatGmtOffsetLabel(tz) {
+      try {
+        const fmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'longOffset' });
+        const parts = fmt.formatToParts(new Date());
+        return parts.find(p => p.type === 'timeZoneName')?.value || 'GMT';
+      } catch (_) {
+        return 'GMT';
+      }
+    }
+
+    /** Minutes east of UTC (e.g. Tokyo +540); used for sorting. */
+    function offsetMinutesEastOfUtc(tz) {
+      try {
+        const fmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'longOffset' });
+        const name = fmt.formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value || '';
+        const m = name.match(/(?:GMT|UTC)([+-])(\d{1,2})(?::(\d{2}))?/);
+        if (!m) return 0;
+        const sign = m[1] === '+' ? 1 : -1;
+        const hh = parseInt(m[2], 10);
+        const mm = m[3] ? parseInt(m[3], 10) : 0;
+        return sign * (hh * 60 + mm);
+      } catch (_) {
+        return 0;
+      }
+    }
+
+    function initTzSelect() {
+      const sel = document.getElementById('tzDisplay');
+      if (!sel) return;
+      let zones = [];
+      try {
+        if (typeof Intl.supportedValuesOf === 'function') {
+          zones = Intl.supportedValuesOf('timeZone');
+        }
+      } catch (_) {}
+      if (!zones.length) {
+        zones = ['UTC', 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London', 'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney'];
+      }
+      getRefTz();
+      const disp = localStorage.getItem(LS_DISPLAY_TZ) || getRefTz();
+      const zoneSet = new Set(zones);
+      zoneSet.add(disp);
+      const rows = [...zoneSet].map(z => ({
+        z,
+        off: offsetMinutesEastOfUtc(z),
+        gmt: formatGmtOffsetLabel(z)
+      }));
+      rows.sort((a, b) => (a.off !== b.off ? a.off - b.off : a.z.localeCompare(b.z)));
+      rows.forEach(({ z, gmt }) => {
+        const opt = document.createElement('option');
+        opt.value = z;
+        opt.textContent = `${z} (${gmt})`;
+        sel.appendChild(opt);
+      });
+      sel.value = disp;
+      sel.addEventListener('change', () => {
+        localStorage.setItem(LS_DISPLAY_TZ, sel.value);
+        render();
+      });
+    }
+
     function renderPalette() {
       const palette = document.getElementById('palette');
       palette.innerHTML = '<span class="palette-label">Workflows:</span>';
@@ -179,105 +347,6 @@
         renderPalette();
         render();
       });
-    }
-
-    function render() {
-      const cal = document.getElementById('calendar');
-      cal.innerHTML = '';
-      const slots = 48;
-      for (let row = 0; row <= slots; row++) {
-        const mins = row * 30;
-        const timeStr = formatTime(mins);
-        const timeCell = document.createElement('div');
-        timeCell.className = 'cell time';
-        timeCell.textContent = timeStr;
-        cal.appendChild(timeCell);
-        for (let day = 0; day < 7; day++) {
-          const cell = document.createElement('div');
-          cell.className = 'cell droppable';
-          cell.dataset.day = day;
-          cell.dataset.time = timeStr;
-          const chips = data.workflows.filter(w =>
-            w.day === day && w.time === timeStr
-          );
-          chips.forEach(w => {
-            const chip = document.createElement('span');
-            chip.className = `chip ${w.workflow}`;
-            chip.textContent = w.workflow;
-            chip.draggable = true;
-            chip.dataset.id = w.id;
-            chip.dataset.workflow = w.workflow;
-            chip.dataset.bat = w.bat;
-            chip.dataset.day = w.day === null ? 'all' : String(w.day);
-            chip.dataset.time = w.time;
-            chip.addEventListener('dragstart', onDragStart);
-            cell.appendChild(chip);
-          });
-          cell.addEventListener('dragover', onDragOver);
-          cell.addEventListener('drop', onDrop);
-          cal.appendChild(cell);
-        }
-      }
-      const headerRow = document.querySelectorAll('.cell.time');
-      const firstRow = cal.querySelector('.cell.droppable');
-      if (firstRow) {
-        const header = document.createElement('div');
-        header.className = 'cell header';
-        header.textContent = '';
-        cal.insertBefore(header, cal.firstChild);
-        DAYS.forEach(d => {
-          const h = document.createElement('div');
-          h.className = 'cell header';
-          h.textContent = d;
-          cal.appendChild(h);
-        });
-      }
-      cal.style.gridTemplateRows = `repeat(${slots + 1}, auto)`;
-    }
-
-    function buildGrid() {
-      const cal = document.getElementById('calendar');
-      cal.innerHTML = '';
-      const headerEmpty = document.createElement('div');
-      headerEmpty.className = 'cell header';
-      cal.appendChild(headerEmpty);
-      DAYS.forEach(d => {
-        const h = document.createElement('div');
-        h.className = 'cell header';
-        h.textContent = d;
-        cal.appendChild(h);
-      });
-      for (let row = 0; row < 48; row++) {
-        const mins = row * 30;
-        const timeStr = formatTime(mins);
-        const tc = document.createElement('div');
-        tc.className = 'cell time';
-        tc.textContent = timeStr;
-        cal.appendChild(tc);
-        for (let day = 0; day < 7; day++) {
-          const cell = document.createElement('div');
-          cell.className = 'cell droppable';
-          cell.dataset.day = day;
-          cell.dataset.time = timeStr;
-          data.workflows.filter(w =>
-            w.day === day && w.time === timeStr
-          ).forEach(w => {
-            const chip = document.createElement('span');
-            chip.className = `chip ${w.workflow}`;
-            chip.textContent = w.workflow;
-            chip.draggable = true;
-            chip.dataset.workflow = w.workflow;
-            chip.dataset.bat = w.bat;
-            chip.dataset.day = w.day === null ? 'all' : String(w.day);
-            chip.dataset.time = w.time;
-            chip.addEventListener('dragstart', onDragStart);
-            cell.appendChild(chip);
-          });
-          cell.addEventListener('dragover', onDragOver);
-          cell.addEventListener('drop', onDrop);
-          cal.appendChild(cell);
-        }
-      }
     }
 
     let dragData = null;
@@ -372,7 +441,7 @@
           }
           let j = {};
           try { j = await r.json(); } catch (_) {}
-          if (j.sync === false) {
+          if (j.sync === false || j.restart === false) {
             status.textContent = 'Saved';
             status.className = 'status saved sync-fail';
           } else {
@@ -415,7 +484,8 @@
       times.forEach(timeStr => {
         const tc = document.createElement('div');
         tc.className = 'cell time';
-        tc.textContent = timeStr;
+        tc.textContent = displayTimeLabel(timeStr);
+        tc.title = timeStr + ' (stored)';
         cal.appendChild(tc);
         for (let col = 0; col < 7; col++) {
           const day = (col + 1) % 7;
@@ -463,6 +533,7 @@
       });
     }
 
+    initTzSelect();
     load();
   </script>
 </body>

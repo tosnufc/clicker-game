@@ -61,6 +61,37 @@ def _run_git_sync():
         return False, "gitpull.bat failed", "\n\n".join(sections)
 
     return True, "saved, pushed, and pulled on remotes", "\n\n".join(sections)
+
+
+def _run_restart_scheduler_bat():
+    """Run restart_scheduler.bat (SSH remotes + scheduler_restart on each)."""
+    bat = os.path.join(REPO_ROOT, "restart_scheduler.bat")
+    if not os.path.isfile(bat):
+        return False, "--- restart_scheduler.bat (missing) ---\n(not found)", ""
+    r = subprocess.run(
+        ["cmd", "/c", "restart_scheduler.bat", "nopause"],
+        cwd=REPO_ROOT,
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=900,
+    )
+    out = (r.stdout or "").rstrip()
+    err = (r.stderr or "").rstrip()
+    body = []
+    if out:
+        body.append(out)
+    if err:
+        body.append(err)
+    block = "\n".join(body) if body else "(no output)"
+    section = f"--- restart_scheduler.bat (exit {r.returncode}) ---\n{block}"
+    print(section + "\n", flush=True)
+    ok = r.returncode == 0
+    return ok, section
+
+
 server_ref = None
 
 
@@ -89,6 +120,18 @@ class Handler(SimpleHTTPRequestHandler):
                     sync_ok, msg, log = False, "git sync timed out", ""
                 except OSError as e:
                     sync_ok, msg, log = False, f"sync failed: {e}", ""
+                try:
+                    restart_ok, restart_section = _run_restart_scheduler_bat()
+                except subprocess.TimeoutExpired:
+                    restart_ok, restart_section = False, "--- restart_scheduler.bat (timeout) ---"
+                except OSError as e:
+                    restart_ok, restart_section = False, f"restart_scheduler.bat failed: {e}"
+                parts = [p for p in (log, restart_section) if p]
+                full_log = "\n\n".join(parts) if parts else None
+                if restart_ok:
+                    msg = f"{msg}; restart_scheduler.bat completed"
+                else:
+                    msg = f"{msg}; restart_scheduler.bat failed"
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
@@ -97,8 +140,9 @@ class Handler(SimpleHTTPRequestHandler):
                         {
                             "ok": True,
                             "sync": sync_ok,
+                            "restart": restart_ok,
                             "message": msg,
-                            "log": log or None,
+                            "log": full_log,
                         }
                     ).encode()
                 )

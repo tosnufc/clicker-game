@@ -9,4 +9,5 @@ for /L %%i in (60,1,64) do (
     "C:\Program Files\Git\usr\bin\ssh.exe" user@192.168.1.%%i "d: && cd dev\clicker-game && .venv\Scripts\python.exe close_game_dialog.py & .venv\Scripts\python.exe scheduler_restart.py && exit"
     echo.
 )
-pause
+rem Skip pause when run non-interactively (e.g. from scheduler_server after Save)
+if "%~1"=="" pause

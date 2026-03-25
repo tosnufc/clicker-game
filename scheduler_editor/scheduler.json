@@ -269,6 +269,12 @@
       "bat": "prime_recruitment_30_workflow.bat",
       "day": 6,
       "time": "07:30"
+    },
+    {
+      "workflow": "claim_daily",
+      "bat": "claim_daily_workflow.bat",
+      "day": 3,
+      "time": "15:30"
     }
   ]
 }

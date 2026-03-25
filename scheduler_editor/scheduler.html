@@ -49,9 +49,27 @@
     button.save:hover { background: #40916c; }
     button.exit { background: #e94560; color: white; }
     button.exit:hover { background: #ff6b6b; }
-    .status { color: #94a3b8; font-size: 10px; }
-    .status.ok { color: #2d6a4f; }
-    .status.err { color: #e94560; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 54px;
+      min-height: 24px;
+      padding: 2px 4px;
+      box-sizing: border-box;
+      text-align: center;
+      border-radius: 4px;
+      background: #1e293b;
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .status.saving { color: #e94560; }
+    .status.saved { color: #fff; background: rgba(45, 106, 79, 0.25); }
+    .status.saved.sync-fail { color: #fff; background: rgba(233, 69, 96, 0.22); }
+    .status.ok { color: #fff; background: rgba(45, 106, 79, 0.25); }
+    .status.err { color: #e94560; background: rgba(233, 69, 96, 0.22); }
   </style>
 </head>
 <body>
@@ -310,36 +328,64 @@
     });
 
     function save() {
-      const collapsed = [];
-      const byKey = {};
-      data.workflows.forEach(w => {
-        const key = `${w.workflow}|${w.bat}|${w.time}`;
-        if (!byKey[key]) byKey[key] = [];
-        byKey[key].push(w);
-      });
-      Object.values(byKey).forEach(group => {
-        const days = group.map(w => w.day).filter(d => d != null);
-        const allDays = days.length === 7 && new Set(days).size === 7;
-        if (allDays && group.length === 7) {
-          collapsed.push({ workflow: group[0].workflow, bat: group[0].bat, day: null, time: group[0].time });
-        } else {
-          group.forEach(w => {
-            const { id, ...rest } = w;
-            collapsed.push(rest);
-          });
-        }
-      });
       const status = document.getElementById('status');
-      fetch('/save_scheduler', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ workflows: collapsed })
-      }).then(r => {
-        if (r.ok) { status.textContent = 'Saved.'; status.className = 'status ok'; }
-        else { status.textContent = 'Save failed.'; status.className = 'status err'; }
-      }).catch(() => {
-        status.textContent = 'Run scheduler_server.py to enable save.'; status.className = 'status err';
-      });
+      const saveBtn = document.querySelector('button.save');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
+      status.textContent = 'Saving';
+      status.className = 'status saving';
+
+      // Ensure the browser repaints "Saving" before we do any work or start waiting on the server.
+      setTimeout(() => {
+        const collapsed = [];
+        const byKey = {};
+        data.workflows.forEach(w => {
+          const key = `${w.workflow}|${w.bat}|${w.time}`;
+          if (!byKey[key]) byKey[key] = [];
+          byKey[key].push(w);
+        });
+        Object.values(byKey).forEach(group => {
+          const days = group.map(w => w.day).filter(d => d != null);
+          const allDays = days.length === 7 && new Set(days).size === 7;
+          if (allDays && group.length === 7) {
+            collapsed.push({ workflow: group[0].workflow, bat: group[0].bat, day: null, time: group[0].time });
+          } else {
+            group.forEach(w => {
+              const { id, ...rest } = w;
+              collapsed.push(rest);
+            });
+          }
+        });
+
+        fetch('/save_scheduler', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ workflows: collapsed })
+        }).then(async r => {
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Save';
+          if (!r.ok) {
+            status.textContent = 'Save failed.';
+            status.className = 'status err';
+            try { await r.json(); } catch (_) {}
+            return;
+          }
+          let j = {};
+          try { j = await r.json(); } catch (_) {}
+          if (j.sync === false) {
+            status.textContent = 'Saved';
+            status.className = 'status saved sync-fail';
+          } else {
+            status.textContent = 'Saved';
+            status.className = 'status saved';
+          }
+        }).catch(() => {
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Save';
+          status.textContent = 'Run scheduler_server.py to enable save.';
+          status.className = 'status err';
+        });
+      }, 0);
     }
 
     function exitServer() {

@@ -4,4 +4,5 @@ for /L %%i in (60,1,64) do (
     "C:\Program Files\Git\usr\bin\ssh.exe" user@192.168.1.%%i "d: && cd dev\clicker-game && git pull && exit"
     echo.
 )
-pause
+rem Skip pause when run non-interactively (e.g. from scheduler_server after save)
+if "%~1"=="" pause

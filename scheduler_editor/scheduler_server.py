@@ -1,11 +1,66 @@
 """Serves scheduler.html and provides save endpoint for scheduler.json"""
 import json
 import os
+import subprocess
 import sys
 import threading
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+GIT_REL_PATH = "scheduler_editor/scheduler.json"
+
+
+def _run_git_sync():
+    """git add/commit/push scheduler.json, then gitpull.bat on remotes."""
+    sections = []
+
+    def run_cmd(label, args, shell=False):
+        r = subprocess.run(
+            args,
+            cwd=REPO_ROOT,
+            shell=shell,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=600,
+        )
+        out = (r.stdout or "").rstrip()
+        err = (r.stderr or "").rstrip()
+        body = []
+        if out:
+            body.append(out)
+        if err:
+            body.append(err)
+        block = "\n".join(body) if body else "(no output)"
+        section = f"--- {label} (exit {r.returncode}) ---\n{block}"
+        sections.append(section)
+        print(section + "\n", flush=True)
+        return r.returncode
+
+    code = run_cmd("git add", ["git", "add", GIT_REL_PATH])
+    if code != 0:
+        return False, "git add failed", "\n\n".join(sections)
+
+    code = run_cmd('git commit -m "update scheduler"', ["git", "commit", "-m", "update scheduler"])
+    # 1 = nothing to commit (file unchanged); still try push + pull
+    if code not in (0, 1):
+        return False, "git commit failed", "\n\n".join(sections)
+
+    code = run_cmd("git push", ["git", "push"])
+    if code != 0:
+        return False, "git push failed", "\n\n".join(sections)
+
+    bat = os.path.join(REPO_ROOT, "gitpull.bat")
+    if not os.path.isfile(bat):
+        return True, "saved and pushed (gitpull.bat missing)", "\n\n".join(sections)
+
+    code = run_cmd("gitpull.bat", ["cmd", "/c", "gitpull.bat", "nopause"], shell=False)
+    if code != 0:
+        return False, "gitpull.bat failed", "\n\n".join(sections)
+
+    return True, "saved, pushed, and pulled on remotes", "\n\n".join(sections)
 server_ref = None
 
 
@@ -28,10 +83,25 @@ class Handler(SimpleHTTPRequestHandler):
                 path = os.path.join(SCRIPT_DIR, 'scheduler.json')
                 with open(path, 'w') as f:
                     json.dump(data, f, indent=2)
+                try:
+                    sync_ok, msg, log = _run_git_sync()
+                except subprocess.TimeoutExpired:
+                    sync_ok, msg, log = False, "git sync timed out", ""
+                except OSError as e:
+                    sync_ok, msg, log = False, f"sync failed: {e}", ""
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(b'{"ok":true}')
+                self.wfile.write(
+                    json.dumps(
+                        {
+                            "ok": True,
+                            "sync": sync_ok,
+                            "message": msg,
+                            "log": log or None,
+                        }
+                    ).encode()
+                )
             except Exception as e:
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')

@@ -12,13 +12,13 @@ python mute.py
 
 echo Step 1: Login
 python login.py
-echo Waiting 90 seconds...
-timeout /t 90 /nobreak >nul
+echo Waiting 1 second...
+timeout /t 1 /nobreak >nul
 
 echo Step 2: Clear Login Adds
 python clear_login_adds.py
-echo Waiting 30 seconds...
-timeout /t 30 /nobreak >nul
+echo Waiting 3 seconds...
+timeout /t 3 /nobreak >nul
 
 echo Step 3: Claim Daily
 python claim_daily.py

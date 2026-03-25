@@ -124,7 +124,7 @@ print("Launching LastZ...")
 os.startfile(LASTZ_PATH)
 
 print("Waiting for LastZ to load...")
-time.sleep(12)
+time.sleep(60)
 
 found = False
 for attempt in range(WINDOW_FIND_ATTEMPTS):

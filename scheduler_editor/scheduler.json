@@ -274,7 +274,7 @@
       "workflow": "claim_daily",
       "bat": "claim_daily_workflow.bat",
       "day": 3,
-      "time": "22:30"
+      "time": "22:38"
     }
   ]
 }

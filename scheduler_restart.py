@@ -6,19 +6,49 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 scheduler_path = os.path.join(script_dir, "scheduler.bat")
 task_name = "ClickerScheduler"
 
-# Kill any existing scheduler.bat processes via WMI (works across sessions)
+# Kill scheduler-related processes: cmd running scheduler.bat AND python running scheduler_runner.py.
+# The old logic only matched cmd.exe + scheduler.bat, so python.exe kept running and a second
+# scheduler stacked on top.
+KILL_PS = r"""
+$tk = Join-Path $env:SystemRoot 'System32\taskkill.exe'
+$procs = @()
+try {
+    $procs = Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object {
+        $c = $_.CommandLine
+        if (-not $c) { return $false }
+        return ($c -like '*scheduler.bat*' -or $c -like '*scheduler_runner.py*')
+    }
+} catch {
+    $procs = Get-WmiObject Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+        $c = $_.CommandLine
+        if (-not $c) { return $false }
+        return ($c -like '*scheduler.bat*' -or $c -like '*scheduler_runner.py*')
+    }
+}
+if ($null -eq $procs) { $procs = @() }
+$procs = @($procs)
+$seen = @{}
+foreach ($p in $procs) {
+    $id = [int]$p.ProcessId
+    if ($seen.ContainsKey($id)) { continue }
+    $seen[$id] = $true
+    & $tk /F /T /PID $id 2>$null | Out-Null
+}
+if ($seen.Count -gt 0) { $seen.Keys -join ',' } else { '' }
+"""
+
 result = subprocess.run(
-    ["powershell", "-nologo", "-noprofile", "-command",
-     "Get-WmiObject Win32_Process -Filter \"commandline like '%scheduler.bat%' and name='cmd.exe'\" | ForEach-Object { $_.Terminate() | Out-Null; Write-Output $_.ProcessId }"],
-    capture_output=True, text=True
+    ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", KILL_PS],
+    capture_output=True,
+    text=True,
 )
-killed = [l.strip() for l in result.stdout.splitlines() if l.strip().isdigit()]
+killed = [x.strip() for x in (result.stdout or "").split(",") if x.strip().isdigit()]
 if killed:
-    print(f"Killed {len(killed)} scheduler process(es): PID {', '.join(killed)}")
+    print(f"Killed scheduler-related process tree(s): PID {', '.join(killed)}")
     print("Waiting 3 seconds...")
     time.sleep(3)
 else:
-    print("No existing scheduler process found.")
+    print("No existing scheduler process found (scheduler.bat / scheduler_runner.py).")
 
 # Register and start the scheduled task via PowerShell for full control
 ps_script = f'''
@@ -32,8 +62,9 @@ Write-Output "OK"
 '''
 
 result = subprocess.run(
-    ["powershell", "-nologo", "-noprofile", "-command", ps_script],
-    capture_output=True, text=True
+    ["powershell", "-NoProfile", "-Command", ps_script],
+    capture_output=True,
+    text=True,
 )
 
 if "OK" in result.stdout:

@@ -63,6 +63,12 @@
     {
       "workflow": "boomer",
       "bat": "boomer_workflow.bat",
+      "day": 3,
+      "time": "20:30"
+    },
+    {
+      "workflow": "boomer",
+      "bat": "boomer_workflow.bat",
       "day": 2,
       "time": "02:30"
     },

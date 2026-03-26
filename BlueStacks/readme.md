@@ -22,11 +22,14 @@ If you have been playing Last-Z for a period of time, you would know that playin
 
 ### How to Record
 
-1. Open BlueStacks macro manager by pressing ctrl + shift + 7
-2. Press "Record new macro"
+1. Open BlueStacks macro manager by pressing ctrl + shift + 7 or click this icon. <img src="macro_icon.jpg" alt="BlueStacks macro manager icon" width="48" style="vertical-align: middle; margin-left: 4px;" />
+
+2. Press "Record new macro" <img src="record_macro.jpg" alt="Record new macro" width="160" style="vertical-align: middle; margin-left: 4px;" />
 3. Execute the action you intend to do.
 4. Rename the macro to reflect the action.
-5. (Optional) assign a shortcut to execute the macro. 
+5. (Optional) assign a shortcut to execute the macro.
+
+<img src="macro_manager.jpg" alt="Macro manager" width="420" />
 
 ### Recording Tips
 
@@ -38,8 +41,8 @@ If you have been playing Last-Z for a period of time, you would know that playin
 
 ## Playing Macros
 
-- You can press the play button or press the short cut keys to activate the action.
-- You can tell which action is being played by looking at the top bar. It will also show you how many times the action has been executed if you configure it to run multiple times.
+- You can press the play button or press the short cut keys to activate the action. <img src="play.jpg" alt="Play button" width="28" style="vertical-align: middle; margin-left: 4px;" />
+- You can tell which action is being played by looking at the top bar. It will also show you how many times the action has been executed if you configure it to run multiple times. <img src="play_status.jpg" alt="Macro playback status on top bar" width="260" style="vertical-align: middle; margin-left: 4px;" />
 
 ### Single Playback
 
@@ -62,7 +65,7 @@ The scheduler allows you to run macros automatically at specified times or inter
 
 ### Setting Up a Schedule
 
-1. Press 'Scheduler' to open 'Macro scheduler' and press '+'
+1. Press 'Scheduler' to open 'Macro scheduler' and press '+' <img src="macro_scheduler.jpg" alt="Scheduler button" width="100" style="vertical-align: middle; margin-left: 4px;" /> <img src="+scheduler.jpg" alt="Add schedule" width="100" style="vertical-align: middle; margin-left: 4px;" />
 2. Complete all the fields. I won't explain much here, the schedule GUI makes sense.
 3. You can repeat the schedule task. In Last-Z, most likely you would want to repeat it weekly (every 7 days) at the same time.
 
@@ -76,7 +79,7 @@ Merging allows you to combine multiple macros into a single sequence.
 
 ### How to Merge
 
-1. Next to the scheduler button, there is a small merge button on the right. Press it.
+1. Next to the scheduler button, there is a small merge button on the right. Press it. <img src="merge.jpg" alt="Merge button" width="36" style="vertical-align: middle; margin-left: 4px;" />
 2. Follow the GUI and provide the name of the workflow. 
 
 
@@ -88,8 +91,12 @@ If you have multiple farm accounts like me, this feature is very handy. Sync ope
 
 ### Enabling Sync
 
-1. Press ctrl + shift + 9
-2. Select instances you want to sync. Note that you have to run all the instances that you want to sync. 
+1. Press ctrl + shift + 9 or click the sync button <img src="sync.jpg" alt="Sync button" width="36" style="vertical-align: middle; margin-left: 4px;" />
+
+2. Select instances you want to sync. Note that you have to run all the instances that you want to sync.
+
+<img src="sync_operation.jpg" alt="Sync operation — select instances" width="300" />
+
 > **Note:** If the layout inside your HQ is the same across multiple farm accounts, it will be easy to use sync operation. You can use "world" and "headquarters" buttons to reset the position. 
 
 ### Running Macros (or scheduler) with Sync
@@ -98,17 +105,7 @@ If you have multiple farm accounts like me, this feature is very handy. Sync ope
 2. In some cases, you may want to combine scheduler with sync operation if you don't want to define the same schedule multiple times. Imagine that I have 4 farms and 1 main account. With sync operation, I can define the schedule once for all 5 accounts.
 > **Note:** To run multiple accounts at the same time, your PC must be able to handle the workload of running those accounts e.g., CPU, main memory, GPU memory, etc.
 
----
-
-## Tips & Best Practices
-
-- 
-- 
-- 
-
----
+<img src="sync_farms.jpg" alt="Multiple BlueStacks instances (farms)" width="720" />
 
 
----
-
-*Last updated: February 2026*
+*Last updated: March 2026*

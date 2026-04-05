@@ -113,7 +113,6 @@ def main():
         tick += 1
         if tick >= 120:
             tick = 0
-            log("Scheduler heartbeat (ok)", logfile)
 
         time.sleep(30)
 

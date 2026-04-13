@@ -55,36 +55,6 @@
       "time": "18:30"
     },
     {
-      "workflow": "boomer",
-      "bat": "boomer_workflow.bat",
-      "day": 1,
-      "time": "20:30"
-    },
-    {
-      "workflow": "boomer",
-      "bat": "boomer_workflow.bat",
-      "day": 2,
-      "time": "02:30"
-    },
-    {
-      "workflow": "boomer",
-      "bat": "boomer_workflow.bat",
-      "day": 6,
-      "time": "14:30"
-    },
-    {
-      "workflow": "boomer",
-      "bat": "boomer_workflow.bat",
-      "day": 5,
-      "time": "11:30"
-    },
-    {
-      "workflow": "boomer",
-      "bat": "boomer_workflow.bat",
-      "day": 0,
-      "time": "11:30"
-    },
-    {
       "workflow": "auto_join",
       "bat": "auto_join_workflow.bat",
       "day": 0,
@@ -227,12 +197,6 @@
       "bat": "soldiers_popping_workflow.bat",
       "day": 6,
       "time": "14:00"
-    },
-    {
-      "workflow": "boomer",
-      "bat": "boomer_workflow.bat",
-      "day": 1,
-      "time": "06:30"
     },
     {
       "workflow": "prime_recruitment_30",

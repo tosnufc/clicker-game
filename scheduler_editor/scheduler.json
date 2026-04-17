@@ -52,7 +52,7 @@
       "workflow": "claim_8-hrs",
       "bat": "claim_8-hrs_workflow.bat",
       "day": 5,
-      "time": "20:30"
+      "time": "19:30"
     },
     {
       "workflow": "claim_daily",

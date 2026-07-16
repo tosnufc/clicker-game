@@ -14,7 +14,7 @@ import time
 
 # Define the number of clicks and the interval between clicks
 num_clicks = 2000000
-click_interval = 0.0005  # seconds between clicks
+click_interval = 0.005  # seconds between clicks
 
 # Get the current mouse position
 click_x, click_y = pyautogui.position()

@@ -6,6 +6,5 @@ exit
 :run
 cd /d "%~dp0"
 call .venv\Scripts\activate.bat
-python zombie.py
+python boomer_4k.py
 exit
-

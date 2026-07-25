@@ -8,8 +8,8 @@ from screen_utils import get_scale_factor, scale_coords
 
 pyautogui.FAILSAFE = False
 
-REPEAT_COUNT = 100000
-SEQUENCE_DELAY = 0.00005
+REPEAT_COUNT = 100000000
+SEQUENCE_DELAY = 0
 
 scale = get_scale_factor()
 

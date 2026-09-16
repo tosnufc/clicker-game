@@ -42,13 +42,17 @@ REM Enumerate matching files, but skip this script and its PS counterpart
 for %%F in ("%scriptDir%\*.%ext%") do (
     if /I not "%%~nxF"=="stop.ps1" if /I not "%%~nxF"=="stop.bat" (
         REM WMIC query: name='<proc>' AND commandline LIKE '%<file>%'
-        for /f "usebackq skip=1 tokens=1" %%P in (`wmic process where "name='%procName%' and commandline like '%%%%~nxF%%'" get processid 2^>nul`) do (
-            set "pidVal=%%P"
-            REM Filter out blank/garbage lines that wmic sometimes emits
-            echo !pidVal! | findstr /r "^[0-9][0-9]*$" >nul && (
-                echo Stopping %label% process ^(PID: !pidVal!^) - %%~nxF
-                taskkill /F /PID !pidVal! >nul 2>&1
-                set "found=1"
+        REM Outer for /f reads raw lines; inner for /f re-tokenizes to strip
+        REM the stray CR that wmic appends (\r\r\n line endings) and to
+        REM discard non-numeric lines (header, "No Instance(s) Available.").
+        for /f "usebackq skip=1 delims=" %%L in (`wmic process where "name='%procName%' and commandline like '%%%%~nxF%%'" get processid 2^>nul`) do (
+            for /f "tokens=1" %%P in ("%%L") do (
+                set "pidVal=%%P"
+                echo !pidVal!| findstr /r "^[0-9][0-9]*$" >nul && (
+                    echo Stopping %label% process ^(PID: !pidVal!^) - %%~nxF
+                    taskkill /F /PID !pidVal! >nul 2>&1
+                    set "found=1"
+                )
             )
         )
     )

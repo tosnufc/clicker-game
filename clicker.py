@@ -15,7 +15,7 @@ import random
 
 # Define the number of clicks and the interval between clicks
 num_clicks = 200000000000
-click_interval = 0  # seconds between clicks
+click_interval = 0  # seconds between clicks (0.230s, 0.282s) (0.278s, 0.268 on Bluestacks 5 accounts running )
 
 # Get the current mouse position
 click_x, click_y = pyautogui.position()
@@ -25,8 +25,8 @@ print(f"Click position: ({click_x}, {click_y})")
 # Perform the clicks
 for i in range(num_clicks):
     # Random offset within 50x50 pixel area
-    offset_x = random.randint(-30, 27)
-    offset_y = random.randint(-25, 26)
+    offset_x = random.randint(-5, 5)
+    offset_y = random.randint(-5, 5)
     click_pos_x = click_x + offset_x
     click_pos_y = click_y + offset_y
 

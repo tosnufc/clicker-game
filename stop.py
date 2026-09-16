@@ -1,12 +1,15 @@
 """Force-stop all automation processes launched by .py/.bat/.ps1 files in
-this directory. Python port of stop.ps1 — parsing WMIC output in Python is
-far more reliable than parsing it in cmd.exe.
+this directory. Python port of stop.ps1.
+
+Uses PowerShell's Get-CimInstance (reliable on Windows 10/11) to enumerate
+processes and their command lines, then taskkill /F /PID matches.
 
 Invoked by stop.bat (which activates the venv and runs `python stop.py`).
 """
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -16,47 +19,38 @@ import sys
 SELF_NAMES = {"stop.py", "stop.bat", "stop.ps1"}
 
 
-def wmic_processes(name: str) -> list[dict[str, str]]:
-    """Return list of {CommandLine, ProcessId, ...} dicts for processes
-    whose image name equals `name` (e.g. 'python.exe')."""
+def ps_processes(name: str) -> list[dict]:
+    """Return [{ProcessId, CommandLine}, ...] for every process whose image
+    name equals `name` (e.g. 'python.exe')."""
+    ps_cmd = (
+        f"Get-CimInstance Win32_Process -Filter \"Name='{name}'\" "
+        f"| Select-Object ProcessId,CommandLine "
+        f"| ConvertTo-Json -Compress"
+    )
     try:
         raw = subprocess.check_output(
-            [
-                "wmic", "process",
-                "where", f"name='{name}'",
-                "get", "processid,commandline",
-                "/format:list",
-            ],
+            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
+             "-Command", ps_cmd],
             stderr=subprocess.DEVNULL,
         )
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        print(f"  [debug] powershell query failed for {name}: {e}")
         return []
 
-    # wmic emits UTF-16 on some systems; try utf-8 then fall back.
-    for enc in ("utf-8", "utf-16", "mbcs"):
-        try:
-            text = raw.decode(enc)
-            break
-        except UnicodeDecodeError:
-            continue
-    else:
-        text = raw.decode("utf-8", errors="ignore")
+    text = raw.decode("utf-8", errors="ignore").strip()
+    if not text:
+        return []
 
-    records: list[dict[str, str]] = []
-    current: dict[str, str] = {}
-    for line in text.splitlines():
-        line = line.strip().lstrip("\ufeff")
-        if not line:
-            if current:
-                records.append(current)
-                current = {}
-            continue
-        if "=" in line:
-            k, v = line.split("=", 1)
-            current[k.strip()] = v.strip()
-    if current:
-        records.append(current)
-    return records
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError as e:
+        print(f"  [debug] JSON parse failed for {name}: {e}")
+        return []
+
+    # ConvertTo-Json emits a single object when there is exactly one match.
+    if isinstance(data, dict):
+        data = [data]
+    return data
 
 
 def taskkill(pid: int) -> bool:
@@ -73,7 +67,11 @@ def sweep(proc_name: str, ext: str, label: str, script_dir: str) -> None:
         f for f in os.listdir(script_dir)
         if f.lower().endswith("." + ext) and f.lower() not in SELF_NAMES
     ]
-    if not files:
+    procs = ps_processes(proc_name)
+    print(f"  [debug] {proc_name}: {len(procs)} process(es), "
+          f"{len(files)} local *.{ext} file(s)")
+
+    if not files or not procs:
         print(f"No {label} processes found.")
         return
 
@@ -82,14 +80,13 @@ def sweep(proc_name: str, ext: str, label: str, script_dir: str) -> None:
     )
 
     found = False
-    for proc in wmic_processes(proc_name):
-        pid_str = proc.get("ProcessId", "")
-        cmdline = proc.get("CommandLine", "") or ""
-        if not pid_str.isdigit():
+    for proc in procs:
+        pid = proc.get("ProcessId")
+        cmdline = proc.get("CommandLine") or ""
+        if not isinstance(pid, int):
             continue
         if not pattern.search(cmdline):
             continue
-        pid = int(pid_str)
         # Extra safety: never kill our own interpreter or launcher.
         if pid == os.getpid() or pid == os.getppid():
             continue
@@ -111,10 +108,9 @@ def main() -> int:
 
     sweep("python.exe", "py", "Python", script_dir)
     print()
-    sweep("powershell.exe", "ps1", "PowerShell", script_dir)
-    print()
-    # Also match pythonw.exe (windowless python) in case any script uses it.
     sweep("pythonw.exe", "py", "PythonW", script_dir)
+    print()
+    sweep("powershell.exe", "ps1", "PowerShell", script_dir)
     print()
     sweep("cmd.exe", "bat", "CMD", script_dir)
 

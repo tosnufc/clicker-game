@@ -15,7 +15,7 @@ pyautogui.FAILSAFE = False
 scale = get_scale_factor()
 
 # Configuration
-REPEAT_COUNT = 10
+REPEAT_COUNT = 15
 SEQUENCE_DELAY = 180  # seconds between sequences
 
 # Load clicks from JSON file

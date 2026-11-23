@@ -15,8 +15,8 @@ pyautogui.FAILSAFE = False
 scale = get_scale_factor()
 
 # Configuration
-REPEAT_COUNT = 15
-SEQUENCE_DELAY = 90  # seconds between sequences
+REPEAT_COUNT = 1500
+SEQUENCE_DELAY = 20  # seconds between sequences
 
 # Load clicks from JSON file
 with open("boomer.json", "r") as f:
